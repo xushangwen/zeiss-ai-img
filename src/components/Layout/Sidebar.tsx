@@ -2,7 +2,7 @@ import { useStore } from '../../stores/useStore';
 import 'remixicon/fonts/remixicon.css';
 
 export function Sidebar() {
-  const { currentView, setCurrentView, tasks } = useStore();
+  const { currentView, setCurrentView, tasks, resetAllData } = useStore();
 
   // 统计任务状态
   const stats = {
@@ -10,6 +10,12 @@ export function Sidebar() {
     generating: tasks.filter((t) => t.status === 'generating').length,
     reviewing: tasks.filter((t) => t.status === 'reviewing').length,
     completed: tasks.filter((t) => t.status === 'completed').length,
+  };
+
+  const handleReset = () => {
+    if (confirm('确定要重置所有数据吗？这将清除所有图库图片和缓存数据。')) {
+      resetAllData();
+    }
   };
 
   const navItems = [
@@ -85,6 +91,15 @@ export function Sidebar() {
             <div className="text-xs text-text-secondary">已完成</div>
           </div>
         </div>
+
+        {/* 重置按钮 */}
+        <button
+          onClick={handleReset}
+          className="w-full mt-3 px-3 py-2 text-xs text-text-secondary hover:text-error hover:bg-error/10 rounded-lg transition-colors flex items-center justify-center gap-1"
+        >
+          <i className="ri-refresh-line"></i>
+          重置所有数据
+        </button>
       </div>
     </aside>
   );

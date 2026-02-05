@@ -22,7 +22,7 @@ export type TaskPart =
   | 'pantoscopic-tilt'    // 倾斜角
   | 'face-form-angle';    // 镜面角
 
-// 单个任务
+// 单个任务（简化版，不存储图片数据）
 export interface Task {
   id: string;
   part: TaskPart;
@@ -30,23 +30,19 @@ export interface Task {
   title: string;
   description: string;
   status: TaskStatus;
-  thumbnails: GeneratedImage[];
-  finalImage?: GeneratedImage;
-  prompt?: string;
-  referenceImage?: string;
 }
 
-// 生成的图片
+// 生成的图片（临时数据，不持久化）
 export interface GeneratedImage {
   id: string;
-  url: string;           // base64 或 URL
+  url: string;           // base64
   prompt: string;
   aspectRatio?: AspectRatio;
   createdAt: number;
   taskId?: string;
 }
 
-// 图库中存储的图片元数据（不含实际图片数据，图片存在 IndexedDB）
+// 图库中存储的图片元数据（图片数据在 IndexedDB）
 export interface GalleryImageMeta {
   id: string;
   prompt: string;
@@ -60,23 +56,23 @@ export interface PromptTemplate {
   id: string;
   name: string;
   content: string;
-  variables: string[];   // 可替换变量列表
+  variables: string[];
   category: TaskPart | 'general';
   isDefault?: boolean;
 }
 
 // API 请求
 export interface GenerateRequest {
-  personDescription?: string;  // 从参考图分析的人物描述
-  taskDescription: string;     // 任务描述
-  referenceImage?: string;     // base64
+  personDescription?: string;
+  taskDescription: string;
+  referenceImage?: string;
   aspectRatio?: AspectRatio;
   count: number;
 }
 
 // API 响应
 export interface GenerateResponse {
-  images: string[];      // base64 数组
+  images: string[];
   prompt: string;
 }
 
@@ -85,7 +81,7 @@ export interface AppState {
   // 当前视图
   currentView: 'workspace' | 'gallery' | 'templates';
 
-  // 任务相关
+  // 任务相关（只存储基本信息，不存储图片）
   tasks: Task[];
   currentTaskId: string | null;
 
@@ -95,7 +91,7 @@ export interface AppState {
   // 图库（只存储元数据，图片数据在 IndexedDB）
   gallery: GalleryImageMeta[];
 
-  // 工作区状态
+  // 工作区状态（临时数据，不持久化）
   referenceImage: string | null;
   personInfo: PersonInfo | null;
   currentPrompt: string;
@@ -122,4 +118,5 @@ export interface AppState {
   clearReferenceImage: () => void;
   saveTemplate: (template: PromptTemplate) => void;
   deleteTemplate: (id: string) => void;
+  resetAllData: () => void;  // 重置所有数据
 }

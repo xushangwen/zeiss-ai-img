@@ -38,24 +38,6 @@ export function TaskCard({ task, isSelected, onClick }: TaskCardProps) {
           <i className={status.icon}></i>
         </div>
       </div>
-
-      {/* 缩略图预览 */}
-      {task.thumbnails.length > 0 && (
-        <div className="flex gap-1 mt-2">
-          {task.thumbnails.slice(0, 4).map((img) => (
-            <div
-              key={img.id}
-              className="w-8 h-8 rounded bg-bg-primary overflow-hidden"
-            >
-              <img
-                src={img.url}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
-        </div>
-      )}
     </button>
   );
 }
