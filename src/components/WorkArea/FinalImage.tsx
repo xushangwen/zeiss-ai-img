@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useStore } from '../../stores/useStore';
 
 // 比例对应的尺寸显示
@@ -20,6 +21,8 @@ export function FinalImage() {
     aspectRatio,
   } = useStore();
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const selectedImage = thumbnails.find((t) => t.id === selectedThumbnailId);
   const currentTask = tasks.find((t) => t.id === currentTaskId);
 
@@ -32,20 +35,28 @@ export function FinalImage() {
     link.click();
   };
 
-  const handleSaveToGallery = () => {
-    if (!selectedImage) return;
+  const handleSaveToGallery = async () => {
+    if (!selectedImage || isSaving) return;
 
-    const imageWithTask = {
-      ...selectedImage,
-      taskId: currentTaskId || undefined,
-    };
-    addToGallery(imageWithTask);
+    setIsSaving(true);
+    try {
+      const imageWithTask = {
+        ...selectedImage,
+        taskId: currentTaskId || undefined,
+      };
+      await addToGallery(imageWithTask);
 
-    if (currentTaskId) {
-      updateTaskStatus(currentTaskId, 'completed');
+      if (currentTaskId) {
+        updateTaskStatus(currentTaskId, 'completed');
+      }
+
+      alert('已保存到图库');
+    } catch (error) {
+      console.error('保存失败:', error);
+      alert('保存失败，请重试');
+    } finally {
+      setIsSaving(false);
     }
-
-    alert('已保存到图库');
   };
 
   return (
@@ -59,10 +70,20 @@ export function FinalImage() {
           <div className="flex items-center gap-2">
             <button
               onClick={handleSaveToGallery}
-              className="px-3 py-1.5 bg-success hover:bg-success/80 text-white text-sm rounded-lg flex items-center gap-2 transition-colors"
+              disabled={isSaving}
+              className="px-3 py-1.5 bg-success hover:bg-success/80 disabled:opacity-50 text-white text-sm rounded-lg flex items-center gap-2 transition-colors"
             >
-              <i className="ri-save-line"></i>
-              保存到图库
+              {isSaving ? (
+                <>
+                  <i className="ri-loader-4-line animate-spin"></i>
+                  保存中...
+                </>
+              ) : (
+                <>
+                  <i className="ri-save-line"></i>
+                  保存到图库
+                </>
+              )}
             </button>
             <button
               onClick={handleDownload}

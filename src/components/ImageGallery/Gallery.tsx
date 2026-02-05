@@ -1,11 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '../../stores/useStore';
-import type { GeneratedImage } from '../../types';
+import { getImage } from '../../utils/imageStorage';
+import type { GalleryImageMeta } from '../../types';
+
+// 带有图片数据的完整图片类型
+interface GalleryImageWithData extends GalleryImageMeta {
+  url: string;
+}
 
 export function Gallery() {
-  const { gallery, tasks } = useStore();
-  const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(null);
+  const { gallery, tasks, removeFromGallery } = useStore();
+  const [selectedImage, setSelectedImage] = useState<GalleryImageWithData | null>(null);
   const [filter, setFilter] = useState<string>('all');
+  const [loadedImages, setLoadedImages] = useState<Map<string, string>>(new Map());
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 从 IndexedDB 加载图片数据
+  useEffect(() => {
+    const loadImages = async () => {
+      setIsLoading(true);
+      const newLoadedImages = new Map<string, string>();
+
+      for (const meta of gallery) {
+        try {
+          const imageData = await getImage(meta.id);
+          if (imageData) {
+            newLoadedImages.set(meta.id, imageData);
+          }
+        } catch (error) {
+          console.error(`加载图片 ${meta.id} 失败:`, error);
+        }
+      }
+
+      setLoadedImages(newLoadedImages);
+      setIsLoading(false);
+    };
+
+    loadImages();
+  }, [gallery]);
 
   // 获取任务名称
   const getTaskName = (taskId?: string) => {
@@ -21,7 +53,7 @@ export function Gallery() {
       : gallery.filter((img) => img.taskId === filter);
 
   // 下载图片
-  const handleDownload = (image: GeneratedImage) => {
+  const handleDownload = (image: GalleryImageWithData) => {
     const link = document.createElement('a');
     link.href = image.url;
     link.download = `zeiss-${image.id}.png`;
@@ -30,9 +62,27 @@ export function Gallery() {
 
   // 批量下载
   const handleBatchDownload = () => {
-    filteredGallery.forEach((img, index) => {
-      setTimeout(() => handleDownload(img), index * 200);
+    filteredGallery.forEach((meta, index) => {
+      const url = loadedImages.get(meta.id);
+      if (url) {
+        setTimeout(() => {
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `zeiss-${meta.id}.png`;
+          link.click();
+        }, index * 200);
+      }
     });
+  };
+
+  // 删除图片
+  const handleDelete = async (id: string) => {
+    if (confirm('确定要删除这张图片吗？')) {
+      await removeFromGallery(id);
+      if (selectedImage?.id === id) {
+        setSelectedImage(null);
+      }
+    }
   };
 
   // 格式化时间
@@ -45,6 +95,25 @@ export function Gallery() {
     });
   };
 
+  // 点击图片查看详情
+  const handleImageClick = (meta: GalleryImageMeta) => {
+    const url = loadedImages.get(meta.id);
+    if (url) {
+      setSelectedImage({ ...meta, url });
+    }
+  };
+
+  if (isLoading && gallery.length > 0) {
+    return (
+      <div className="p-6 flex items-center justify-center h-64">
+        <div className="text-center text-text-secondary">
+          <i className="ri-loader-4-line animate-spin text-3xl mb-2"></i>
+          <p className="text-sm">加载图片中...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -55,7 +124,6 @@ export function Gallery() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {/* 筛选 */}
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -68,7 +136,6 @@ export function Gallery() {
               </option>
             ))}
           </select>
-          {/* 批量下载 */}
           {filteredGallery.length > 0 && (
             <button
               onClick={handleBatchDownload}
@@ -81,32 +148,49 @@ export function Gallery() {
         </div>
       </div>
 
-      {/* 图片网格 */}
       {filteredGallery.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filteredGallery.map((image) => (
-            <div
-              key={image.id}
-              className="group bg-bg-card rounded-card overflow-hidden border border-border hover:border-accent/50 transition-colors cursor-pointer"
-              onClick={() => setSelectedImage(image)}
-            >
-              <div className="aspect-square overflow-hidden">
-                <img
-                  src={image.url}
-                  alt=""
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                />
+          {filteredGallery.map((meta) => {
+            const imageUrl = loadedImages.get(meta.id);
+            return (
+              <div
+                key={meta.id}
+                className="group bg-bg-card rounded-card overflow-hidden border border-border hover:border-accent/50 transition-colors cursor-pointer relative"
+                onClick={() => handleImageClick(meta)}
+              >
+                <div className="aspect-square overflow-hidden bg-bg-primary">
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt=""
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-text-secondary">
+                      <i className="ri-image-line text-2xl"></i>
+                    </div>
+                  )}
+                </div>
+                <div className="p-2">
+                  <p className="text-xs text-text-secondary truncate">
+                    {getTaskName(meta.taskId)}
+                  </p>
+                  <p className="text-xs text-text-secondary font-mono">
+                    {formatTime(meta.createdAt)}
+                  </p>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(meta.id);
+                  }}
+                  className="absolute top-2 right-2 w-6 h-6 bg-error/80 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error"
+                >
+                  <i className="ri-delete-bin-line text-xs"></i>
+                </button>
               </div>
-              <div className="p-2">
-                <p className="text-xs text-text-secondary truncate">
-                  {getTaskName(image.taskId)}
-                </p>
-                <p className="text-xs text-text-secondary font-mono">
-                  {formatTime(image.createdAt)}
-                </p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center h-64 text-text-secondary">
@@ -116,7 +200,6 @@ export function Gallery() {
         </div>
       )}
 
-      {/* 图片预览弹窗 */}
       {selectedImage && (
         <div
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-8"
@@ -139,8 +222,14 @@ export function Gallery() {
                 <i className="ri-download-line"></i>
               </button>
               <button
-                onClick={() => setSelectedImage(null)}
+                onClick={() => handleDelete(selectedImage.id)}
                 className="w-10 h-10 bg-bg-card/80 rounded-full flex items-center justify-center text-text-primary hover:bg-error transition-colors"
+              >
+                <i className="ri-delete-bin-line"></i>
+              </button>
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="w-10 h-10 bg-bg-card/80 rounded-full flex items-center justify-center text-text-primary hover:bg-bg-card transition-colors"
               >
                 <i className="ri-close-line"></i>
               </button>

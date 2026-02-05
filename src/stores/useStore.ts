@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AppState } from '../types';
+import type { AppState, GeneratedImage, GalleryImageMeta } from '../types';
 import { zeissTasks, defaultTemplates } from '../data/zeissRequirements';
+import { saveImage, deleteImage } from '../utils/imageStorage';
 
 export const useStore = create<AppState>()(
   persist(
@@ -45,9 +46,12 @@ export const useStore = create<AppState>()(
 
       setPersonInfo: (info) => set({ personInfo: info }),
 
+      // 清除参考图和人物信息
+      clearReferenceImage: () =>
+        set({ referenceImage: null, personInfo: null }),
+
       setCurrentPrompt: (prompt) => {
         set({ currentPrompt: prompt });
-        // 同步更新当前任务的 prompt
         const { currentTaskId, tasks } = get();
         if (currentTaskId) {
           set({
@@ -60,7 +64,6 @@ export const useStore = create<AppState>()(
 
       setThumbnails: (images) => {
         set({ thumbnails: images });
-        // 同步更新当前任务的 thumbnails
         const { currentTaskId, tasks } = get();
         if (currentTaskId) {
           set({
@@ -79,10 +82,32 @@ export const useStore = create<AppState>()(
 
       setAspectRatio: (ratio) => set({ aspectRatio: ratio }),
 
-      addToGallery: (image) =>
+      // 保存到图库（图片数据存 IndexedDB，元数据存 store）
+      addToGallery: async (image: GeneratedImage) => {
+        // 保存图片数据到 IndexedDB
+        await saveImage(image.id, image.url);
+
+        // 只在 store 中保存元数据
+        const meta: GalleryImageMeta = {
+          id: image.id,
+          prompt: image.prompt,
+          aspectRatio: image.aspectRatio,
+          createdAt: image.createdAt,
+          taskId: image.taskId,
+        };
+
         set((state) => ({
-          gallery: [image, ...state.gallery],
-        })),
+          gallery: [meta, ...state.gallery],
+        }));
+      },
+
+      // 从图库删除
+      removeFromGallery: async (id: string) => {
+        await deleteImage(id);
+        set((state) => ({
+          gallery: state.gallery.filter((img) => img.id !== id),
+        }));
+      },
 
       saveTemplate: (template) =>
         set((state) => {
@@ -107,7 +132,8 @@ export const useStore = create<AppState>()(
       partialize: (state) => ({
         tasks: state.tasks,
         templates: state.templates,
-        gallery: state.gallery,
+        gallery: state.gallery, // 现在只存元数据，不会超出 localStorage 限制
+        aspectRatio: state.aspectRatio,
       }),
     }
   )

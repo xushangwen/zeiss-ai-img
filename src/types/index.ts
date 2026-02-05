@@ -46,6 +46,15 @@ export interface GeneratedImage {
   taskId?: string;
 }
 
+// 图库中存储的图片元数据（不含实际图片数据，图片存在 IndexedDB）
+export interface GalleryImageMeta {
+  id: string;
+  prompt: string;
+  aspectRatio?: AspectRatio;
+  createdAt: number;
+  taskId?: string;
+}
+
 // 提示词模板
 export interface PromptTemplate {
   id: string;
@@ -83,8 +92,8 @@ export interface AppState {
   // 模板相关
   templates: PromptTemplate[];
 
-  // 图库
-  gallery: GeneratedImage[];
+  // 图库（只存储元数据，图片数据在 IndexedDB）
+  gallery: GalleryImageMeta[];
 
   // 工作区状态
   referenceImage: string | null;
@@ -108,7 +117,9 @@ export interface AppState {
   setIsGenerating: (value: boolean) => void;
   setIsAnalyzing: (value: boolean) => void;
   setAspectRatio: (ratio: AspectRatio) => void;
-  addToGallery: (image: GeneratedImage) => void;
+  addToGallery: (image: GeneratedImage) => Promise<void>;
+  removeFromGallery: (id: string) => Promise<void>;
+  clearReferenceImage: () => void;
   saveTemplate: (template: PromptTemplate) => void;
   deleteTemplate: (id: string) => void;
 }
