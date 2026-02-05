@@ -53,9 +53,10 @@ export function ThumbnailGrid() {
         personInfo,
         referenceImage || undefined,
         aspectRatio,
-        2  // 生成2张
+        1  // 生成1张（避免超时）
       );
-      setThumbnails(images);
+      // 追加到现有图片列表，而不是替换
+      setThumbnails([...thumbnails, ...images]);
       selectThumbnail(null);
       if (currentTaskId) {
         updateTaskStatus(currentTaskId, 'reviewing');
@@ -85,23 +86,35 @@ export function ThumbnailGrid() {
           <i className="ri-image-line text-accent"></i>
           图片生成
         </h3>
-        <button
-          onClick={handleGenerate}
-          disabled={loading || !currentTaskId}
-          className="px-3 py-1.5 bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm rounded-lg flex items-center gap-2 transition-colors"
-        >
-          {loading ? (
-            <>
-              <i className="ri-loader-4-line animate-spin"></i>
-              生成中...
-            </>
-          ) : (
-            <>
-              <i className="ri-magic-line"></i>
-              生成 2 张
-            </>
+        <div className="flex gap-2">
+          {thumbnails.length > 0 && (
+            <button
+              onClick={() => setThumbnails([])}
+              disabled={loading}
+              className="px-3 py-1.5 bg-bg-primary hover:bg-border disabled:opacity-50 disabled:cursor-not-allowed text-text-secondary text-sm rounded-lg flex items-center gap-2 transition-colors"
+            >
+              <i className="ri-delete-bin-line"></i>
+              清空
+            </button>
           )}
-        </button>
+          <button
+            onClick={handleGenerate}
+            disabled={loading || !currentTaskId}
+            className="px-3 py-1.5 bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm rounded-lg flex items-center gap-2 transition-colors"
+          >
+            {loading ? (
+              <>
+                <i className="ri-loader-4-line animate-spin"></i>
+                生成中...
+              </>
+            ) : (
+              <>
+                <i className="ri-magic-line"></i>
+                生成图片
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* 比例选择 */}
