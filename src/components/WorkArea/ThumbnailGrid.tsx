@@ -5,11 +5,11 @@ import type { AspectRatio } from '../../types';
 
 // 比例选项
 const ASPECT_RATIOS: { value: AspectRatio; label: string; icon: string }[] = [
-  { value: '1:1', label: '1:1 正方形', icon: 'ri-checkbox-blank-line' },
-  { value: '16:9', label: '16:9 横屏', icon: 'ri-landscape-line' },
-  { value: '9:16', label: '9:16 竖屏', icon: 'ri-smartphone-line' },
-  { value: '4:3', label: '4:3 标准', icon: 'ri-tablet-line' },
-  { value: '3:4', label: '3:4 竖版', icon: 'ri-file-line' },
+  { value: '1:1', label: '1:1', icon: 'ri-checkbox-blank-line' },
+  { value: '16:9', label: '16:9', icon: 'ri-landscape-line' },
+  { value: '9:16', label: '9:16', icon: 'ri-smartphone-line' },
+  { value: '4:3', label: '4:3', icon: 'ri-tablet-line' },
+  { value: '3:4', label: '3:4', icon: 'ri-file-line' },
 ];
 
 export function ThumbnailGrid() {
@@ -18,12 +18,13 @@ export function ThumbnailGrid() {
     selectedThumbnailId,
     selectThumbnail,
     setThumbnails,
-    currentPrompt,
     referenceImage,
+    personInfo,
     isGenerating,
     setIsGenerating,
     updateTaskStatus,
     currentTaskId,
+    tasks,
     aspectRatio,
     setAspectRatio,
   } = useStore();
@@ -31,9 +32,13 @@ export function ThumbnailGrid() {
   const { generateImages, isLoading, error } = useGemini();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+  // 获取当前任务描述
+  const currentTask = tasks.find((t) => t.id === currentTaskId);
+  const taskDescription = currentTask?.description || '';
+
   const handleGenerate = async () => {
-    if (!currentPrompt.trim()) {
-      alert('请先输入提示词');
+    if (!taskDescription) {
+      alert('请先选择一个任务');
       return;
     }
 
@@ -44,10 +49,11 @@ export function ThumbnailGrid() {
 
     try {
       const images = await generateImages(
-        currentPrompt,
+        taskDescription,
+        personInfo,
         referenceImage || undefined,
         aspectRatio,
-        4
+        2  // 生成2张
       );
       setThumbnails(images);
       selectThumbnail(null);
@@ -63,11 +69,10 @@ export function ThumbnailGrid() {
     }
   };
 
-  // 下载图片
   const handleDownload = (url: string, index: number) => {
     const link = document.createElement('a');
     link.href = url;
-    link.download = `zeiss-${currentTaskId || 'image'}-${index + 1}-${Date.now()}.png`;
+    link.download = `zeiss-${currentTask?.title || 'image'}-${index + 1}-${Date.now()}.png`;
     link.click();
   };
 
@@ -82,7 +87,7 @@ export function ThumbnailGrid() {
         </h3>
         <button
           onClick={handleGenerate}
-          disabled={loading}
+          disabled={loading || !currentTaskId}
           className="px-3 py-1.5 bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm rounded-lg flex items-center gap-2 transition-colors"
         >
           {loading ? (
@@ -93,7 +98,7 @@ export function ThumbnailGrid() {
           ) : (
             <>
               <i className="ri-magic-line"></i>
-              生成 4 张
+              生成 2 张
             </>
           )}
         </button>
@@ -101,7 +106,6 @@ export function ThumbnailGrid() {
 
       {/* 比例选择 */}
       <div className="mb-3">
-        <label className="text-xs text-text-secondary mb-2 block">图片比例</label>
         <div className="flex gap-2 flex-wrap">
           {ASPECT_RATIOS.map((ratio) => (
             <button
@@ -119,6 +123,14 @@ export function ThumbnailGrid() {
           ))}
         </div>
       </div>
+
+      {/* 当前任务描述预览 */}
+      {currentTask && (
+        <div className="mb-3 p-2 bg-bg-primary rounded-lg text-xs text-text-secondary">
+          <span className="text-text-primary font-medium">{currentTask.title}：</span>
+          {taskDescription.slice(0, 80)}...
+        </div>
+      )}
 
       {error && (
         <div className="mb-3 p-2 bg-error/10 border border-error/30 rounded-lg text-sm text-error">
@@ -142,32 +154,25 @@ export function ThumbnailGrid() {
                 onClick={() => selectThumbnail(img.id)}
                 className="w-full aspect-square"
               >
-                <img
-                  src={img.url}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
+                <img src={img.url} alt="" className="w-full h-full object-cover" />
               </button>
               {selectedThumbnailId === img.id && (
                 <div className="absolute top-2 right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center">
                   <i className="ri-check-line text-white text-sm"></i>
                 </div>
               )}
-              {/* 操作按钮 */}
               <div className="absolute bottom-2 left-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => setPreviewImage(img.url)}
                   className="flex-1 py-1.5 bg-bg-primary/90 text-text-primary text-xs rounded flex items-center justify-center gap-1 hover:bg-bg-primary"
                 >
                   <i className="ri-zoom-in-line"></i>
-                  放大
                 </button>
                 <button
                   onClick={() => handleDownload(img.url, index)}
                   className="flex-1 py-1.5 bg-accent/90 text-white text-xs rounded flex items-center justify-center gap-1 hover:bg-accent"
                 >
                   <i className="ri-download-line"></i>
-                  下载
                 </button>
               </div>
             </div>
@@ -175,17 +180,12 @@ export function ThumbnailGrid() {
         ) : (
           <div className="col-span-2 h-48 flex flex-col items-center justify-center text-text-secondary">
             <i className="ri-image-add-line text-4xl mb-2"></i>
-            <span className="text-sm">点击上方按钮生成图片</span>
-            <span className="text-xs mt-1">直接生成 2K 高清图片</span>
+            <span className="text-sm">
+              {currentTaskId ? '点击生成按钮' : '请先选择任务'}
+            </span>
           </div>
         )}
       </div>
-
-      {thumbnails.length > 0 && (
-        <p className="mt-3 text-xs text-text-secondary text-center">
-          点击图片选中，悬停可放大或下载
-        </p>
-      )}
 
       {/* 图片预览弹窗 */}
       {previewImage && (
@@ -196,7 +196,7 @@ export function ThumbnailGrid() {
           <div className="relative max-w-4xl max-h-[90vh]">
             <img
               src={previewImage}
-              alt="预览"
+              alt=""
               className="max-w-full max-h-[90vh] object-contain rounded-lg"
             />
             <button

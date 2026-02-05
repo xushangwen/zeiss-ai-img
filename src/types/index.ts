@@ -58,8 +58,9 @@ export interface PromptTemplate {
 
 // API 请求
 export interface GenerateRequest {
-  prompt: string;
-  referenceImage?: string;  // base64
+  personDescription?: string;  // 从参考图分析的人物描述
+  taskDescription: string;     // 任务描述
+  referenceImage?: string;     // base64
   aspectRatio?: AspectRatio;
   count: number;
 }

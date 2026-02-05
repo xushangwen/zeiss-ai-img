@@ -2,7 +2,6 @@ import { Sidebar } from './components/Layout/Sidebar';
 import { Header } from './components/Layout/Header';
 import { TaskList } from './components/TaskPanel/TaskList';
 import { ReferenceUpload } from './components/WorkArea/ReferenceUpload';
-import { PromptEditor } from './components/WorkArea/PromptEditor';
 import { ThumbnailGrid } from './components/WorkArea/ThumbnailGrid';
 import { FinalImage } from './components/WorkArea/FinalImage';
 import { TemplateList } from './components/TemplateManager/TemplateList';
@@ -32,15 +31,14 @@ function App() {
               <div className="flex-1 p-6 overflow-y-auto">
                 {currentTaskId ? (
                   <div className="grid grid-cols-2 gap-6 h-full">
-                    {/* 左列：参考图 + 提示词 */}
+                    {/* 左列：参考图 + 图片生成 */}
                     <div className="flex flex-col gap-4">
                       <ReferenceUpload />
-                      <PromptEditor />
+                      <ThumbnailGrid />
                     </div>
 
-                    {/* 右列：小图 + 大图 */}
+                    {/* 右列：选中图片展示 */}
                     <div className="flex flex-col gap-4">
-                      <ThumbnailGrid />
                       <FinalImage />
                     </div>
                   </div>
@@ -48,9 +46,6 @@ function App() {
                   <div className="h-full flex flex-col items-center justify-center text-text-secondary">
                     <i className="ri-cursor-line text-5xl mb-4"></i>
                     <p className="text-lg">请从左侧选择一个任务开始</p>
-                    <p className="text-sm mt-2">
-                      或者点击任务卡片查看详情
-                    </p>
                   </div>
                 )}
               </div>

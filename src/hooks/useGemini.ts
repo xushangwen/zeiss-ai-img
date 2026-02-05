@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { GenerateRequest, GenerateResponse, GeneratedImage, AspectRatio } from '../types';
+import type { GenerateRequest, GenerateResponse, GeneratedImage, AspectRatio, PersonInfo } from '../types';
 
 export function useGemini() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,9 +13,7 @@ export function useGemini() {
       try {
         const response = await fetch('/api/generate', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(request),
         });
 
@@ -26,7 +24,6 @@ export function useGemini() {
 
         const data: GenerateResponse = await response.json();
 
-        // 转换为 GeneratedImage 格式
         const images: GeneratedImage[] = data.images.map((base64, index) => ({
           id: `img-${Date.now()}-${index}`,
           url: `data:image/png;base64,${base64}`,
@@ -47,16 +44,23 @@ export function useGemini() {
     []
   );
 
-  // 生成图片（直接生成 2K 尺寸）
+  // 根据人物信息和任务描述自动生成图片
   const generateImages = useCallback(
     async (
-      prompt: string,
+      taskDescription: string,
+      personInfo: PersonInfo | null,
       referenceImage?: string,
       aspectRatio: AspectRatio = '1:1',
-      count = 4
+      count = 2
     ): Promise<GeneratedImage[]> => {
+      // 将人物信息转换为描述文本
+      const personDescription = personInfo
+        ? `${personInfo.gender}，${personInfo.age}，${personInfo.skinTone}皮肤，${personInfo.hairStyle}，${personInfo.appearance}`
+        : undefined;
+
       return generate({
-        prompt,
+        personDescription,
+        taskDescription,
         referenceImage,
         aspectRatio,
         count,
