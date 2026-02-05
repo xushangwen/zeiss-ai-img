@@ -71,7 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           contents: [{ role: 'user', parts }],
           generationConfig: {
             temperature: 0.1,
-            maxOutputTokens: 500,
+            maxOutputTokens: 2000,  // gemini-3-flash-preview 需要更多 token（包含思考过程）
           },
         }),
       }
