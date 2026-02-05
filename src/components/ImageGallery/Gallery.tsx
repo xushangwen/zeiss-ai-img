@@ -153,7 +153,7 @@ export function Gallery() {
                 {selectedImage.prompt}
               </p>
               <div className="flex items-center gap-4 mt-2 text-xs text-text-secondary">
-                <span>尺寸: {selectedImage.size === 'large' ? '1024x1024' : '512x512'}</span>
+                <span>比例: {selectedImage.aspectRatio || '1:1'}</span>
                 <span>{formatTime(selectedImage.createdAt)}</span>
               </div>
             </div>

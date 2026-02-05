@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { GenerateRequest, GenerateResponse, GeneratedImage } from '../types';
+import type { GenerateRequest, GenerateResponse, GeneratedImage, AspectRatio } from '../types';
 
 export function useGemini() {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +31,7 @@ export function useGemini() {
           id: `img-${Date.now()}-${index}`,
           url: `data:image/png;base64,${base64}`,
           prompt: data.prompt,
-          size: request.size,
+          aspectRatio: request.aspectRatio,
           createdAt: Date.now(),
         }));
 
@@ -47,44 +47,27 @@ export function useGemini() {
     []
   );
 
-  // 生成小图（测试用）
-  const generateThumbnails = useCallback(
+  // 生成图片（直接生成 2K 尺寸）
+  const generateImages = useCallback(
     async (
       prompt: string,
       referenceImage?: string,
+      aspectRatio: AspectRatio = '1:1',
       count = 4
     ): Promise<GeneratedImage[]> => {
       return generate({
         prompt,
         referenceImage,
-        size: 'small',
+        aspectRatio,
         count,
       });
     },
     [generate]
   );
 
-  // 生成大图（最终输出）
-  const generateFinal = useCallback(
-    async (
-      prompt: string,
-      referenceImage?: string
-    ): Promise<GeneratedImage> => {
-      const images = await generate({
-        prompt,
-        referenceImage,
-        size: 'large',
-        count: 1,
-      });
-      return images[0];
-    },
-    [generate]
-  );
-
   return {
     generate,
-    generateThumbnails,
-    generateFinal,
+    generateImages,
     isLoading,
     error,
     clearError: () => setError(null),

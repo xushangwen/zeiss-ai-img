@@ -1,6 +1,19 @@
 // 任务状态
 export type TaskStatus = 'pending' | 'generating' | 'reviewing' | 'completed';
 
+// 人物信息（从参考图分析）
+export interface PersonInfo {
+  age: string;
+  gender: string;
+  appearance: string;
+  skinTone: string;
+  hairStyle: string;
+  facialFeatures: string;
+}
+
+// 图片比例
+export type AspectRatio = '1:1' | '16:9' | '9:16' | '4:3' | '3:4';
+
 // 任务分组
 export type TaskPart =
   | 'pupil-distance'      // 瞳距偏差
@@ -28,7 +41,7 @@ export interface GeneratedImage {
   id: string;
   url: string;           // base64 或 URL
   prompt: string;
-  size: 'small' | 'large';
+  aspectRatio?: AspectRatio;
   createdAt: number;
   taskId?: string;
 }
@@ -47,7 +60,7 @@ export interface PromptTemplate {
 export interface GenerateRequest {
   prompt: string;
   referenceImage?: string;  // base64
-  size: 'small' | 'large';
+  aspectRatio?: AspectRatio;
   count: number;
 }
 
@@ -74,20 +87,26 @@ export interface AppState {
 
   // 工作区状态
   referenceImage: string | null;
+  personInfo: PersonInfo | null;
   currentPrompt: string;
   thumbnails: GeneratedImage[];
   selectedThumbnailId: string | null;
   isGenerating: boolean;
+  isAnalyzing: boolean;
+  aspectRatio: AspectRatio;
 
   // Actions
   setCurrentView: (view: AppState['currentView']) => void;
   setCurrentTask: (taskId: string | null) => void;
   updateTaskStatus: (taskId: string, status: TaskStatus) => void;
   setReferenceImage: (image: string | null) => void;
+  setPersonInfo: (info: PersonInfo | null) => void;
   setCurrentPrompt: (prompt: string) => void;
   setThumbnails: (images: GeneratedImage[]) => void;
   selectThumbnail: (id: string | null) => void;
   setIsGenerating: (value: boolean) => void;
+  setIsAnalyzing: (value: boolean) => void;
+  setAspectRatio: (ratio: AspectRatio) => void;
   addToGallery: (image: GeneratedImage) => void;
   saveTemplate: (template: PromptTemplate) => void;
   deleteTemplate: (id: string) => void;

@@ -13,10 +13,13 @@ export const useStore = create<AppState>()(
       templates: defaultTemplates,
       gallery: [],
       referenceImage: null,
+      personInfo: null,
       currentPrompt: '',
       thumbnails: [],
       selectedThumbnailId: null,
       isGenerating: false,
+      isAnalyzing: false,
+      aspectRatio: '1:1',
 
       // Actions
       setCurrentView: (view) => set({ currentView: view }),
@@ -39,6 +42,8 @@ export const useStore = create<AppState>()(
         })),
 
       setReferenceImage: (image) => set({ referenceImage: image }),
+
+      setPersonInfo: (info) => set({ personInfo: info }),
 
       setCurrentPrompt: (prompt) => {
         set({ currentPrompt: prompt });
@@ -69,6 +74,10 @@ export const useStore = create<AppState>()(
       selectThumbnail: (id) => set({ selectedThumbnailId: id }),
 
       setIsGenerating: (value) => set({ isGenerating: value }),
+
+      setIsAnalyzing: (value) => set({ isAnalyzing: value }),
+
+      setAspectRatio: (ratio) => set({ aspectRatio: ratio }),
 
       addToGallery: (image) =>
         set((state) => ({

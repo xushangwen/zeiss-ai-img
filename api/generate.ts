@@ -1,9 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+// 比例对应的尺寸（Gemini 支持的尺寸）
+const ASPECT_RATIO_SIZES: Record<string, { width: number; height: number }> = {
+  '1:1': { width: 1024, height: 1024 },
+  '16:9': { width: 1344, height: 768 },
+  '9:16': { width: 768, height: 1344 },
+  '4:3': { width: 1152, height: 896 },
+  '3:4': { width: 896, height: 1152 },
+};
+
 interface GenerateRequest {
   prompt: string;
   referenceImage?: string;
-  size: 'small' | 'large';
+  aspectRatio?: string;
   count: number;
 }
 
@@ -19,14 +28,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { prompt, referenceImage, size, count } = req.body as GenerateRequest;
+    const { prompt, referenceImage, aspectRatio = '1:1', count } = req.body as GenerateRequest;
 
     if (!prompt) {
       return res.status(400).json({ error: '提示词不能为空' });
     }
 
-    // 根据 size 设置图片尺寸
-    const imageSize = size === 'large' ? 1024 : 512;
+    // 获取尺寸
+    const size = ASPECT_RATIO_SIZES[aspectRatio] || ASPECT_RATIO_SIZES['1:1'];
 
     // 构建请求内容
     const contents: Array<{ role: string; parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> }> = [];
@@ -54,7 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 ${prompt}
 
 要求：
-- 图片尺寸：${imageSize}x${imageSize}
+- 图片尺寸：${size.width}x${size.height}
 - 风格：专业医疗说明图，清晰的人物特写
 - 背景：简洁的白色或浅灰色
 - 光线：柔和自然
