@@ -72,9 +72,28 @@ export function useGemini() {
     [generate]
   );
 
+  // 使用自定义提示词生成图片
+  const generateWithCustomPrompt = useCallback(
+    async (
+      customPrompt: string,
+      referenceImage?: string,
+      aspectRatio: AspectRatio = '1:1',
+      count = 1
+    ): Promise<GeneratedImage[]> => {
+      return generate({
+        customPrompt,
+        referenceImage,
+        aspectRatio,
+        count,
+      });
+    },
+    [generate]
+  );
+
   return {
     generate,
     generateImages,
+    generateWithCustomPrompt,
     isLoading,
     error,
     clearError: () => setError(null),

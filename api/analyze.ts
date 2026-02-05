@@ -59,9 +59,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
     ];
 
-    // 使用 gemini-2.0-flash 模型分析图片（更便宜）
+    // 使用 gemini-3-flash-preview 模型分析图片（最新性价比模型）
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {

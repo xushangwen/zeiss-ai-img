@@ -27,9 +27,11 @@ export function ThumbnailGrid() {
     tasks,
     aspectRatio,
     setAspectRatio,
+    useCustomPrompt,
+    finalPrompt,
   } = useStore();
 
-  const { generateImages, isLoading, error } = useGemini();
+  const { generateImages, generateWithCustomPrompt, isLoading, error } = useGemini();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   // 获取当前任务描述
@@ -37,8 +39,13 @@ export function ThumbnailGrid() {
   const taskDescription = currentTask?.description || '';
 
   const handleGenerate = async () => {
-    if (!taskDescription) {
-      alert('请先选择一个任务');
+    if (!currentTaskId && !useCustomPrompt) {
+      alert('请先选择一个任务或使用自定义提示词');
+      return;
+    }
+
+    if (useCustomPrompt && !finalPrompt.trim()) {
+      alert('提示词不能为空');
       return;
     }
 
@@ -48,13 +55,27 @@ export function ThumbnailGrid() {
     }
 
     try {
-      const images = await generateImages(
-        taskDescription,
-        personInfo,
-        referenceImage || undefined,
-        aspectRatio,
-        1  // 生成1张（避免超时）
-      );
+      let images;
+
+      if (useCustomPrompt) {
+        // 使用自定义提示词生图
+        images = await generateWithCustomPrompt(
+          finalPrompt,
+          referenceImage || undefined,
+          aspectRatio,
+          1
+        );
+      } else {
+        // 使用自动组合的提示词生图
+        images = await generateImages(
+          taskDescription,
+          personInfo,
+          referenceImage || undefined,
+          aspectRatio,
+          1
+        );
+      }
+
       // 追加到现有图片列表，而不是替换
       setThumbnails([...thumbnails, ...images]);
       selectThumbnail(null);
@@ -99,7 +120,7 @@ export function ThumbnailGrid() {
           )}
           <button
             onClick={handleGenerate}
-            disabled={loading || !currentTaskId}
+            disabled={loading || (!currentTaskId && !useCustomPrompt)}
             className="px-3 py-1.5 bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm rounded-lg flex items-center gap-2 transition-colors"
           >
             {loading ? (
@@ -110,7 +131,7 @@ export function ThumbnailGrid() {
             ) : (
               <>
                 <i className="ri-magic-line"></i>
-                生成图片
+                {useCustomPrompt ? '用模板生图' : '生成图片'}
               </>
             )}
           </button>
@@ -138,10 +159,18 @@ export function ThumbnailGrid() {
       </div>
 
       {/* 当前任务描述预览 */}
-      {currentTask && (
+      {currentTask && !useCustomPrompt && (
         <div className="mb-3 p-2 bg-bg-primary rounded-lg text-xs text-text-secondary">
           <span className="text-text-primary font-medium">{currentTask.title}：</span>
           {taskDescription.slice(0, 80)}...
+        </div>
+      )}
+
+      {/* 自定义提示词模式提示 */}
+      {useCustomPrompt && (
+        <div className="mb-3 p-2 bg-accent/10 border border-accent/30 rounded-lg text-xs text-accent flex items-center gap-2">
+          <i className="ri-magic-line"></i>
+          <span>使用自定义提示词模式，参考图仅作为图片参考</span>
         </div>
       )}
 
@@ -194,7 +223,11 @@ export function ThumbnailGrid() {
           <div className="col-span-2 h-48 flex flex-col items-center justify-center text-text-secondary">
             <i className="ri-image-add-line text-4xl mb-2"></i>
             <span className="text-sm">
-              {currentTaskId ? '点击生成按钮' : '请先选择任务'}
+              {useCustomPrompt
+                ? '点击生成按钮使用自定义提示词生图'
+                : currentTaskId
+                ? '点击生成按钮'
+                : '请先选择任务'}
             </span>
           </div>
         )}

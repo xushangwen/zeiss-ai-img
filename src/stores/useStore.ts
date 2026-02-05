@@ -28,6 +28,9 @@ export const useStore = create<AppState>()(
       referenceImage: null,
       personInfo: null,
       currentPrompt: '',
+      finalPrompt: '',
+      useCustomPrompt: false,
+      selectedTemplateId: null,
       thumbnails: [],
       selectedThumbnailId: null,
       isGenerating: false,
@@ -63,6 +66,12 @@ export const useStore = create<AppState>()(
         set({ referenceImage: null, personInfo: null }),
 
       setCurrentPrompt: (prompt) => set({ currentPrompt: prompt }),
+
+      setFinalPrompt: (prompt) => set({ finalPrompt: prompt }),
+
+      setUseCustomPrompt: (value) => set({ useCustomPrompt: value }),
+
+      setSelectedTemplate: (id) => set({ selectedTemplateId: id }),
 
       // 设置生成的图片（只在内存中，不持久化）
       setThumbnails: (images) => set({ thumbnails: images }),
@@ -113,15 +122,11 @@ export const useStore = create<AppState>()(
 
       saveTemplate: (template) =>
         set((state) => {
-          const exists = state.templates.find((t) => t.id === template.id);
-          if (exists) {
-            return {
-              templates: state.templates.map((t) =>
-                t.id === template.id ? template : t
-              ),
-            };
-          }
-          return { templates: [...state.templates, template] };
+          const newTemplate = {
+            ...template,
+            id: `template-${Date.now()}`,
+          };
+          return { templates: [...state.templates, newTemplate] };
         }),
 
       deleteTemplate: (id) =>
@@ -148,6 +153,9 @@ export const useStore = create<AppState>()(
           referenceImage: null,
           personInfo: null,
           currentPrompt: '',
+          finalPrompt: '',
+          useCustomPrompt: false,
+          selectedTemplateId: null,
           thumbnails: [],
           selectedThumbnailId: null,
           isGenerating: false,
@@ -166,6 +174,7 @@ export const useStore = create<AppState>()(
         gallery: state.gallery,
         aspectRatio: state.aspectRatio,
         taskStates: state.taskStates,  // 持久化任务状态
+        templates: state.templates,  // 持久化模板
       }),
       // 从持久化数据恢复后，合并任务状态
       onRehydrateStorage: () => (state) => {

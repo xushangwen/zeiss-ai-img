@@ -2,7 +2,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 interface GenerateRequest {
   personDescription?: string;  // 从参考图分析的人物描述
-  taskDescription: string;     // 任务描述
+  taskDescription?: string;     // 任务描述
+  customPrompt?: string;        // 自定义提示词（优先级最高）
   referenceImage?: string;
   aspectRatio?: string;
   count: number;
@@ -19,14 +20,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { personDescription, taskDescription, referenceImage, aspectRatio = '1:1', count } = req.body as GenerateRequest;
+    const { personDescription, taskDescription, customPrompt, referenceImage, aspectRatio = '1:1', count } = req.body as GenerateRequest;
 
-    if (!taskDescription) {
-      return res.status(400).json({ error: '任务描述不能为空' });
+    // 如果提供了自定义提示词，直接使用；否则自动整合
+    const prompt = customPrompt || buildPrompt(personDescription, taskDescription, !!referenceImage);
+
+    if (!prompt) {
+      return res.status(400).json({ error: '提示词不能为空' });
     }
-
-    // 自动整合提示词
-    const prompt = buildPrompt(personDescription, taskDescription, !!referenceImage);
 
     // 构建请求内容
     const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
@@ -105,7 +106,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 }
 
 // 自动整合提示词
-function buildPrompt(personDescription: string | undefined, taskDescription: string, hasReference: boolean): string {
+function buildPrompt(personDescription: string | undefined, taskDescription: string | undefined, hasReference: boolean): string {
+  if (!taskDescription) {
+    return '';
+  }
+
   let prompt = '';
 
   // 核心摄影风格要求（放在最前面，强调优先级）

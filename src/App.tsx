@@ -2,6 +2,7 @@ import { Sidebar } from './components/Layout/Sidebar';
 import { Header } from './components/Layout/Header';
 import { TaskList } from './components/TaskPanel/TaskList';
 import { ReferenceUpload } from './components/WorkArea/ReferenceUpload';
+import { PromptEditor } from './components/WorkArea/PromptEditor';
 import { ThumbnailGrid } from './components/WorkArea/ThumbnailGrid';
 import { FinalImage } from './components/WorkArea/FinalImage';
 import { TemplateList } from './components/TemplateManager/TemplateList';
@@ -31,9 +32,10 @@ function App() {
               <div className="flex-1 p-6 overflow-y-auto">
                 {currentTaskId ? (
                   <div className="grid grid-cols-2 gap-6 h-full">
-                    {/* 左列：参考图 + 图片生成 */}
+                    {/* 左列：参考图 + 提示词编辑 + 图片生成 */}
                     <div className="flex flex-col gap-4">
                       <ReferenceUpload />
+                      <PromptEditor />
                       <ThumbnailGrid />
                     </div>
 

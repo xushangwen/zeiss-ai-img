@@ -64,7 +64,8 @@ export interface PromptTemplate {
 // API 请求
 export interface GenerateRequest {
   personDescription?: string;
-  taskDescription: string;
+  taskDescription?: string;
+  customPrompt?: string;  // 自定义提示词（优先级最高）
   referenceImage?: string;
   aspectRatio?: AspectRatio;
   count: number;
@@ -96,6 +97,9 @@ export interface AppState {
   referenceImage: string | null;
   personInfo: PersonInfo | null;
   currentPrompt: string;
+  finalPrompt: string;  // 最终提示词（可编辑）
+  useCustomPrompt: boolean;  // 是否使用自定义提示词模式
+  selectedTemplateId: string | null;  // 当前选中的模板
   thumbnails: GeneratedImage[];
   selectedThumbnailId: string | null;
   isGenerating: boolean;
@@ -109,6 +113,9 @@ export interface AppState {
   setReferenceImage: (image: string | null) => void;
   setPersonInfo: (info: PersonInfo | null) => void;
   setCurrentPrompt: (prompt: string) => void;
+  setFinalPrompt: (prompt: string) => void;
+  setUseCustomPrompt: (value: boolean) => void;
+  setSelectedTemplate: (id: string | null) => void;
   setThumbnails: (images: GeneratedImage[]) => void;
   selectThumbnail: (id: string | null) => void;
   setIsGenerating: (value: boolean) => void;
@@ -117,7 +124,7 @@ export interface AppState {
   addToGallery: (image: GeneratedImage) => Promise<void>;
   removeFromGallery: (id: string) => Promise<void>;
   clearReferenceImage: () => void;
-  saveTemplate: (template: PromptTemplate) => void;
+  saveTemplate: (template: Omit<PromptTemplate, 'id'>) => void;
   deleteTemplate: (id: string) => void;
   resetAllData: () => void;  // 重置所有数据
 }
