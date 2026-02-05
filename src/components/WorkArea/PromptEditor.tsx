@@ -12,17 +12,7 @@ function buildFinalPrompt(
     return '';
   }
 
-  let prompt = '';
-
-  // 核心摄影风格要求
-  prompt += `摄影风格要求：
-- 必须是真实照片级别的摄影作品（photorealistic photography）
-- 专业医疗说明图风格
-- 使用专业相机拍摄的效果
-- 禁止任何插画、卡通、手绘、艺术化风格
-- 禁止风格化处理
-
-`;
+  let prompt = 'Generate a photorealistic medical illustration photograph.\n\n';
 
   if (personDescription) {
     prompt += `人物特征：${personDescription}\n\n`;
@@ -31,17 +21,15 @@ function buildFinalPrompt(
   prompt += `场景要求：${taskDescription}\n\n`;
 
   prompt += `技术要求：
-- 清晰的人物特写，焦点准确
-- 简洁的白色或浅灰色背景
-- 柔和自然的光线，避免强烈阴影
-- 图片中不要出现任何文字、标签或水印
-- 人物动作和手部位置必须符合物理逻辑
-- 如果涉及手部动作，手指不能穿过镜片或其他物体
-- 眼镜必须正确佩戴在脸上，不能悬空或穿透皮肤
-- 人物在画面中不要太大，尽量把人物的头部完整显示出来，不要裁切头顶，保持头部在画面中居中偏上`;
+- 真实照片级摄影（photorealistic photography），禁止插画、卡通、手绘等非写实风格
+- 白色或浅灰色简洁背景，柔和自然光线
+- 人物半身构图，头部必须完整显示在画面内（包括头顶和额头），头部占画面高度不超过60%，居中偏上
+- 眼镜正确佩戴在脸上，不悬空、不穿透皮肤
+- 手部动作须符合物理逻辑，手指不能穿过镜片或其他物体，手部的肤质、骨骼粗细须与人物的性别和年龄一致
+- 禁止出现任何文字、标签或水印`;
 
   if (hasReference) {
-    prompt += '\n- 人物外貌请严格参考上传的参考图，保持高度一致性';
+    prompt += '\n- 人物外貌严格参考上传的参考图，保持高度一致性';
   }
 
   return prompt;

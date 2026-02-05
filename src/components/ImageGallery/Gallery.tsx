@@ -117,7 +117,7 @@ export function Gallery() {
   }
 
   return (
-    <div className="p-6">
+    <div className="h-full overflow-y-auto p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-semibold text-text-primary">图库</h2>
@@ -142,7 +142,7 @@ export function Gallery() {
           {filteredGallery.length > 0 && (
             <button
               onClick={handleBatchDownload}
-              className="px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg flex items-center gap-2 transition-colors"
+              className="px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg flex items-center gap-2 transition-colors whitespace-nowrap shrink-0"
             >
               <i className="ri-download-line"></i>
               批量下载 ({filteredGallery.length})

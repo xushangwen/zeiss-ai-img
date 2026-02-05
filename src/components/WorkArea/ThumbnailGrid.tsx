@@ -182,46 +182,46 @@ export function ThumbnailGrid() {
       )}
 
       {/* 图片网格 */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-2">
         {thumbnails.length > 0 ? (
           thumbnails.map((img, index) => (
             <div
               key={img.id}
-              className={`relative group rounded-lg overflow-hidden border-2 transition-all ${
+              className={`relative group rounded-lg overflow-hidden border transition-all ${
                 selectedThumbnailId === img.id
-                  ? 'border-accent ring-2 ring-accent/30'
-                  : 'border-transparent hover:border-accent/50'
+                  ? 'border-accent ring-1 ring-accent/30'
+                  : 'border-border hover:border-accent/50'
               }`}
             >
               <button
                 onClick={() => selectThumbnail(img.id)}
-                className="w-full aspect-square"
+                className="w-full"
               >
-                <img src={img.url} alt="" className="w-full h-full object-cover" />
+                <img src={img.url} alt="" className="block w-full object-cover aspect-square" />
               </button>
               {selectedThumbnailId === img.id && (
-                <div className="absolute top-2 right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center">
-                  <i className="ri-check-line text-white text-sm"></i>
+                <div className="absolute top-1 right-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
+                  <i className="ri-check-line text-white text-xs"></i>
                 </div>
               )}
-              <div className="absolute bottom-2 left-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute bottom-1 left-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => setPreviewImage(img.url)}
-                  className="flex-1 py-1.5 bg-bg-primary/90 text-text-primary text-xs rounded flex items-center justify-center gap-1 hover:bg-bg-primary"
+                  className="flex-1 py-1 bg-bg-primary/90 text-text-primary text-xs rounded flex items-center justify-center hover:bg-bg-primary"
                 >
-                  <i className="ri-zoom-in-line"></i>
+                  <i className="ri-zoom-in-line text-[11px]"></i>
                 </button>
                 <button
                   onClick={() => handleDownload(img.url, index)}
-                  className="flex-1 py-1.5 bg-accent/90 text-white text-xs rounded flex items-center justify-center gap-1 hover:bg-accent"
+                  className="flex-1 py-1 bg-accent/90 text-white text-xs rounded flex items-center justify-center hover:bg-accent"
                 >
-                  <i className="ri-download-line"></i>
+                  <i className="ri-download-line text-[11px]"></i>
                 </button>
               </div>
             </div>
           ))
         ) : (
-          <div className="col-span-2 h-48 flex flex-col items-center justify-center text-text-secondary">
+          <div className="col-span-3 h-32 flex flex-col items-center justify-center text-text-secondary">
             <i className="ri-image-add-line text-4xl mb-2"></i>
             <span className="text-sm">
               {useCustomPrompt

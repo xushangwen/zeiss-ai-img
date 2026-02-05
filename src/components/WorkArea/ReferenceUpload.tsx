@@ -142,7 +142,7 @@ export function ReferenceUpload() {
             <img
               src={referenceImage}
               alt="参考图"
-              className="w-full h-40 object-cover rounded-lg"
+              className="w-full max-h-60 object-contain rounded-lg bg-bg-primary"
             />
             <button
               onClick={handleClear}
