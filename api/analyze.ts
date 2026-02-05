@@ -44,7 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         },
       },
       {
-        text: `请分析这张图片中的人物，提取以下信息并以JSON格式返回：
+        text: `请分析这张图片中的人物特征，并严格按照以下 JSON 格式返回，不要添加任何其他文字、解释或 markdown 代码块标记：
 
 {
   "age": "估计年龄范围，如：25-30岁、中年、老年等",
@@ -55,7 +55,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   "facialFeatures": "面部特征，如：圆脸、瓜子脸、浓眉等"
 }
 
-只返回JSON，不要其他文字。`,
+重要：只返回上述 JSON 对象，不要包含 \`\`\`json 标记或任何其他内容。`,
       },
     ];
 
@@ -86,13 +86,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const data = await response.json();
     const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    // 尝试解析 JSON
-    const jsonMatch = textContent.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('无法解析人物信息');
-    }
+    // 添加日志查看返回内容
+    console.log('AI 返回的原始内容:', textContent);
 
-    const personInfo: PersonInfo = JSON.parse(jsonMatch[0]);
+    // 清理可能的 markdown 代码块标记
+    let cleanedContent = textContent.trim();
+
+    // 移除 ```json 和 ``` 标记
+    cleanedContent = cleanedContent.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+    cleanedContent = cleanedContent.trim();
+
+    // 尝试多种方式解析 JSON
+    let personInfo: PersonInfo;
+
+    // 方式1：尝试直接解析（如果返回的就是纯 JSON）
+    try {
+      personInfo = JSON.parse(cleanedContent);
+      console.log('方式1成功：直接解析');
+    } catch {
+      // 方式2：使用正则提取 JSON
+      const jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        console.error('无法找到 JSON 格式，返回内容:', textContent);
+        throw new Error(`无法解析人物信息。AI 返回: ${textContent.slice(0, 200)}`);
+      }
+      try {
+        personInfo = JSON.parse(jsonMatch[0]);
+        console.log('方式2成功：正则提取');
+      } catch (parseError) {
+        console.error('JSON 解析失败:', parseError);
+        console.error('提取的内容:', jsonMatch[0]);
+        throw new Error(`JSON 解析失败: ${parseError instanceof Error ? parseError.message : '未知错误'}`);
+      }
+    }
 
     return res.status(200).json({
       success: true,
