@@ -1,23 +1,73 @@
 import { useCallback, useState } from 'react';
 import { useStore } from '../../stores/useStore';
 
+// 压缩图片到指定大小
+async function compressImage(file: File, maxSizeKB = 500): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    img.onload = () => {
+      // 计算缩放比例，最大边不超过 800px
+      const maxDim = 800;
+      let { width, height } = img;
+
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = (height / width) * maxDim;
+          width = maxDim;
+        } else {
+          width = (width / height) * maxDim;
+          height = maxDim;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      // 尝试不同质量压缩
+      let quality = 0.8;
+      let result = canvas.toDataURL('image/jpeg', quality);
+
+      // 如果还是太大，继续降低质量
+      while (result.length > maxSizeKB * 1024 * 1.37 && quality > 0.1) {
+        quality -= 0.1;
+        result = canvas.toDataURL('image/jpeg', quality);
+      }
+
+      resolve(result);
+    };
+
+    img.onerror = () => reject(new Error('图片加载失败'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 export function ReferenceUpload() {
   const { referenceImage, setReferenceImage } = useStore();
   const [isDragging, setIsDragging] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
 
   const handleFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       if (!file.type.startsWith('image/')) {
         alert('请上传图片文件');
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string;
-        setReferenceImage(base64);
-      };
-      reader.readAsDataURL(file);
+      setIsCompressing(true);
+      try {
+        // 压缩图片
+        const compressed = await compressImage(file, 500);
+        setReferenceImage(compressed);
+      } catch (err) {
+        console.error('图片压缩失败:', err);
+        alert('图片处理失败，请重试');
+      } finally {
+        setIsCompressing(false);
+      }
     },
     [setReferenceImage]
   );
@@ -86,14 +136,24 @@ export function ReferenceUpload() {
             accept="image/*"
             onChange={handleInputChange}
             className="hidden"
+            disabled={isCompressing}
           />
-          <i className="ri-upload-cloud-line text-3xl text-text-secondary mb-2"></i>
-          <span className="text-sm text-text-secondary">
-            拖拽或点击上传参考图
-          </span>
-          <span className="text-xs text-text-secondary mt-1">
-            用于保持人物相貌一致
-          </span>
+          {isCompressing ? (
+            <>
+              <i className="ri-loader-4-line text-3xl text-accent mb-2 animate-spin"></i>
+              <span className="text-sm text-text-secondary">压缩中...</span>
+            </>
+          ) : (
+            <>
+              <i className="ri-upload-cloud-line text-3xl text-text-secondary mb-2"></i>
+              <span className="text-sm text-text-secondary">
+                拖拽或点击上传参考图
+              </span>
+              <span className="text-xs text-text-secondary mt-1">
+                图片会自动压缩
+              </span>
+            </>
+          )}
         </label>
       )}
     </div>
