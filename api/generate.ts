@@ -50,7 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     for (let i = 0; i < count; i++) {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -58,6 +58,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             contents,
             generationConfig: {
               responseModalities: ['TEXT', 'IMAGE'],
+              imageConfig: {
+                imageSize: '2K',
+                aspectRatio: aspectRatio,
+              },
             },
           }),
         }
