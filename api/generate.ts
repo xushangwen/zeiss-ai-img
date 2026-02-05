@@ -40,6 +40,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             data: base64Match[2],
           },
         });
+        console.log('参考图已添加，类型:', base64Match[1]);
+      } else {
+        console.warn('参考图格式无效，跳过');
       }
     }
 
@@ -70,7 +73,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Gemini API 错误:', errorText);
-        throw new Error(`Gemini API 调用失败: ${response.status}`);
+        // 返回更详细的错误信息
+        return res.status(response.status).json({
+          error: `Gemini API 调用失败: ${response.status}`,
+          details: errorText
+        });
       }
 
       const data = await response.json();

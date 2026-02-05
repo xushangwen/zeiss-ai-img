@@ -19,7 +19,10 @@ export function useGemini() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || `生成失败: ${response.status}`);
+          const errorMsg = errorData.details
+            ? `${errorData.error}\n${errorData.details}`
+            : errorData.error || `生成失败: ${response.status}`;
+          throw new Error(errorMsg);
         }
 
         const data: GenerateResponse = await response.json();
