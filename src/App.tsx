@@ -33,15 +33,15 @@ function App() {
               <div className="flex-1 p-6 overflow-y-auto">
                 {currentTaskId ? (
                   <div className="grid grid-cols-2 gap-6 h-full">
-                    {/* 左列：参考图 + 提示词编辑 + 图片生成 */}
+                    {/* 左列：参考图 + 提示词编辑 */}
                     <div className="flex flex-col gap-4">
                       <ReferenceUpload />
                       <PromptEditor />
-                      <ThumbnailGrid />
                     </div>
 
-                    {/* 右列：选中图片展示 */}
+                    {/* 右列：图片生成 + 选中图片展示 */}
                     <div className="flex flex-col gap-4">
+                      <ThumbnailGrid />
                       <FinalImage />
                     </div>
                   </div>

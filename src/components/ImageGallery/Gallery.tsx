@@ -128,16 +128,17 @@ export function Gallery() {
         <div className="flex items-center gap-3">
           <Select
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(value) => setFilter(value)}
             className="min-w-[200px]"
-          >
-            <option value="all">全部图片</option>
-            {tasks.map((task) => (
-              <option key={task.id} value={task.id}>
-                {task.partName} - {task.title}
-              </option>
-            ))}
-          </Select>
+            placeholder="全部图片"
+            options={[
+              { value: 'all', label: '全部图片' },
+              ...tasks.map((task) => ({
+                value: task.id,
+                label: `${task.partName} - ${task.title}`,
+              })),
+            ]}
+          />
           {filteredGallery.length > 0 && (
             <button
               onClick={handleBatchDownload}

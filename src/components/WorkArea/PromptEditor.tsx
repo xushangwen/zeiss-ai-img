@@ -37,11 +37,11 @@ function buildFinalPrompt(
 - 图片中不要出现任何文字、标签或水印
 - 人物动作和手部位置必须符合物理逻辑
 - 如果涉及手部动作，手指不能穿过镜片或其他物体
-- 眼镜必须正确佩戴在脸上，不能悬空或穿透皮肤`;
+- 眼镜必须正确佩戴在脸上，不能悬空或穿透皮肤
+- 人物在画面中不要太大，尽量把人物的头部完整显示出来，不要裁切头顶，保持头部在画面中居中偏上`;
 
   if (hasReference) {
     prompt += '\n- 人物外貌请严格参考上传的参考图，保持高度一致性';
-    prompt += '\n- 重要：如果参考图中人物佩戴了眼镜，请在生成的图片中移除眼镜，展示未佩戴眼镜的状态（用于展示使用蔡司眼镜前的困扰）';
   }
 
   return prompt;
@@ -193,15 +193,16 @@ export function PromptEditor() {
           <Select
             label="选择模板"
             value={selectedTemplateId || ''}
-            onChange={(e) => handleSelectTemplate(e.target.value)}
-          >
-            <option value="">自动生成（默认）</option>
-            {templates.map((template) => (
-              <option key={template.id} value={template.id}>
-                {template.name}
-              </option>
-            ))}
-          </Select>
+            onChange={(value) => handleSelectTemplate(value)}
+            placeholder="自动生成（默认）"
+            options={[
+              { value: '', label: '自动生成（默认）' },
+              ...templates.map((template) => ({
+                value: template.id,
+                label: template.name,
+              })),
+            ]}
+          />
         </div>
       )}
 
