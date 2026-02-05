@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { useStore } from '../../stores/useStore';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import 'remixicon/fonts/remixicon.css';
 
 export function Sidebar() {
   const { currentView, setCurrentView, tasks, resetAllData } = useStore();
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   // 统计任务状态
   const stats = {
@@ -13,9 +16,8 @@ export function Sidebar() {
   };
 
   const handleReset = () => {
-    if (confirm('确定要重置所有数据吗？这将清除所有图库图片和缓存数据。')) {
-      resetAllData();
-    }
+    resetAllData();
+    setShowResetConfirm(false);
   };
 
   const navItems = [
@@ -94,13 +96,23 @@ export function Sidebar() {
 
         {/* 重置按钮 */}
         <button
-          onClick={handleReset}
+          onClick={() => setShowResetConfirm(true)}
           className="w-full mt-3 px-3 py-2 text-xs text-text-secondary hover:text-error hover:bg-error/10 rounded-lg transition-colors flex items-center justify-center gap-1"
         >
           <i className="ri-refresh-line"></i>
           重置所有数据
         </button>
       </div>
+
+      {/* 重置确认对话框 */}
+      {showResetConfirm && (
+        <ConfirmDialog
+          title="重置所有数据"
+          message="确定要重置所有数据吗？这将清除所有图库图片和缓存数据。"
+          onConfirm={handleReset}
+          onCancel={() => setShowResetConfirm(false)}
+        />
+      )}
     </aside>
   );
 }

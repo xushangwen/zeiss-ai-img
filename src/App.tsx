@@ -7,11 +7,12 @@ import { ThumbnailGrid } from './components/WorkArea/ThumbnailGrid';
 import { FinalImage } from './components/WorkArea/FinalImage';
 import { TemplateList } from './components/TemplateManager/TemplateList';
 import { Gallery } from './components/ImageGallery/Gallery';
+import { ToastContainer } from './components/ui/ToastContainer';
 import { useStore } from './stores/useStore';
 import 'remixicon/fonts/remixicon.css';
 
 function App() {
-  const { currentView, currentTaskId } = useStore();
+  const { currentView, currentTaskId, toasts, removeToast } = useStore();
 
   return (
     <div className="h-full flex">
@@ -59,6 +60,9 @@ function App() {
           {currentView === 'templates' && <TemplateList />}
         </main>
       </div>
+
+      {/* Toast 通知容器 */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
   );
 }

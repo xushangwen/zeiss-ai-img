@@ -140,6 +140,7 @@ function buildPrompt(personDescription: string | undefined, taskDescription: str
 
   if (hasReference) {
     prompt += '\n- 人物外貌请严格参考上传的参考图，保持高度一致性';
+    prompt += '\n- 重要：如果参考图中人物佩戴了眼镜，请在生成的图片中移除眼镜，展示未佩戴眼镜的状态（用于展示使用蔡司眼镜前的困扰）';
   }
 
   return prompt;

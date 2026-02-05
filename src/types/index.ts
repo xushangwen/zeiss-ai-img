@@ -77,6 +77,14 @@ export interface GenerateResponse {
   prompt: string;
 }
 
+// Toast 通知
+export interface ToastMessage {
+  id: string;
+  type: 'success' | 'error' | 'info' | 'warning';
+  message: string;
+  duration?: number;
+}
+
 // 全局状态
 export interface AppState {
   // 当前视图
@@ -106,6 +114,9 @@ export interface AppState {
   isAnalyzing: boolean;
   aspectRatio: AspectRatio;
 
+  // Toast 通知
+  toasts: ToastMessage[];
+
   // Actions
   setCurrentView: (view: AppState['currentView']) => void;
   setCurrentTask: (taskId: string | null) => void;
@@ -127,4 +138,6 @@ export interface AppState {
   saveTemplate: (template: Omit<PromptTemplate, 'id'>) => void;
   deleteTemplate: (id: string) => void;
   resetAllData: () => void;  // 重置所有数据
+  addToast: (message: string, type?: ToastMessage['type'], duration?: number) => void;
+  removeToast: (id: string) => void;
 }

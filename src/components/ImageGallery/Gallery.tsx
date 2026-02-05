@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../../stores/useStore';
 import { getImage } from '../../utils/imageStorage';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
+import { Select } from '../ui/Select';
 import type { GalleryImageMeta } from '../../types';
 
 // 带有图片数据的完整图片类型
@@ -14,6 +16,7 @@ export function Gallery() {
   const [filter, setFilter] = useState<string>('all');
   const [loadedImages, setLoadedImages] = useState<Map<string, string>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   // 从 IndexedDB 加载图片数据
   useEffect(() => {
@@ -77,12 +80,11 @@ export function Gallery() {
 
   // 删除图片
   const handleDelete = async (id: string) => {
-    if (confirm('确定要删除这张图片吗？')) {
-      await removeFromGallery(id);
-      if (selectedImage?.id === id) {
-        setSelectedImage(null);
-      }
+    await removeFromGallery(id);
+    if (selectedImage?.id === id) {
+      setSelectedImage(null);
     }
+    setDeleteConfirm(null);
   };
 
   // 格式化时间
@@ -124,10 +126,10 @@ export function Gallery() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <select
+          <Select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-3 py-2 bg-bg-card border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+            className="min-w-[200px]"
           >
             <option value="all">全部图片</option>
             {tasks.map((task) => (
@@ -135,7 +137,7 @@ export function Gallery() {
                 {task.partName} - {task.title}
               </option>
             ))}
-          </select>
+          </Select>
           {filteredGallery.length > 0 && (
             <button
               onClick={handleBatchDownload}
@@ -182,7 +184,7 @@ export function Gallery() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete(meta.id);
+                    setDeleteConfirm(meta.id);
                   }}
                   className="absolute top-2 right-2 w-6 h-6 bg-error/80 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-error"
                 >
@@ -222,7 +224,7 @@ export function Gallery() {
                 <i className="ri-download-line"></i>
               </button>
               <button
-                onClick={() => handleDelete(selectedImage.id)}
+                onClick={() => setDeleteConfirm(selectedImage.id)}
                 className="w-10 h-10 bg-bg-card/80 rounded-full flex items-center justify-center text-text-primary hover:bg-error transition-colors"
               >
                 <i className="ri-delete-bin-line"></i>
@@ -248,6 +250,15 @@ export function Gallery() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 删除确认对话框 */}
+      {deleteConfirm && (
+        <ConfirmDialog
+          message="确定要删除这张图片吗？"
+          onConfirm={() => handleDelete(deleteConfirm)}
+          onCancel={() => setDeleteConfirm(null)}
+        />
       )}
     </div>
   );

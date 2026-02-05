@@ -19,6 +19,7 @@ export function FinalImage() {
     currentTaskId,
     tasks,
     aspectRatio,
+    addToast,
   } = useStore();
 
   const [isSaving, setIsSaving] = useState(false);
@@ -50,10 +51,10 @@ export function FinalImage() {
         updateTaskStatus(currentTaskId, 'completed');
       }
 
-      alert('已保存到图库');
+      addToast('已保存到图库', 'success');
     } catch (error) {
       console.error('保存失败:', error);
-      alert('保存失败，请重试');
+      addToast('保存失败，请重试', 'error');
     } finally {
       setIsSaving(false);
     }

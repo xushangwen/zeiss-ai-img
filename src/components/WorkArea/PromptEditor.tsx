@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../../stores/useStore';
+import { Select } from '../ui/Select';
 
 // 构建最终提示词（与 API 中的逻辑保持一致）
 function buildFinalPrompt(
@@ -40,6 +41,7 @@ function buildFinalPrompt(
 
   if (hasReference) {
     prompt += '\n- 人物外貌请严格参考上传的参考图，保持高度一致性';
+    prompt += '\n- 重要：如果参考图中人物佩戴了眼镜，请在生成的图片中移除眼镜，展示未佩戴眼镜的状态（用于展示使用蔡司眼镜前的困扰）';
   }
 
   return prompt;
@@ -59,6 +61,7 @@ export function PromptEditor() {
     templates,
     selectedTemplateId,
     setSelectedTemplate,
+    addToast,
   } = useStore();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -101,7 +104,7 @@ export function PromptEditor() {
 
   const handleSaveAsTemplate = () => {
     if (!templateName.trim()) {
-      alert('请输入模板名称');
+      addToast('请输入模板名称', 'warning');
       return;
     }
 
@@ -114,7 +117,7 @@ export function PromptEditor() {
 
     setShowSaveDialog(false);
     setTemplateName('');
-    alert('模板已保存');
+    addToast('模板已保存', 'success');
   };
 
   const handleSelectTemplate = (templateId: string) => {
@@ -187,11 +190,10 @@ export function PromptEditor() {
       {/* 模板选择 */}
       {templates.length > 0 && !isEditing && (
         <div className="mb-3">
-          <label className="text-xs text-text-secondary mb-2 block">选择模板</label>
-          <select
+          <Select
+            label="选择模板"
             value={selectedTemplateId || ''}
             onChange={(e) => handleSelectTemplate(e.target.value)}
-            className="w-full px-3 py-2 bg-bg-primary border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
           >
             <option value="">自动生成（默认）</option>
             {templates.map((template) => (
@@ -199,7 +201,7 @@ export function PromptEditor() {
                 {template.name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       )}
 

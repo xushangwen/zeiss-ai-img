@@ -4,7 +4,7 @@ import type { PromptTemplate, TaskPart } from '../../types';
 import { partNames } from '../../data/zeissRequirements';
 
 export function TemplateList() {
-  const { templates, saveTemplate, deleteTemplate } = useStore();
+  const { templates, saveTemplate, deleteTemplate, addToast } = useStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<PromptTemplate>>({});
 
@@ -29,7 +29,7 @@ export function TemplateList() {
 
   const handleSave = () => {
     if (!editForm.name || !editForm.content) {
-      alert('请填写模板名称和内容');
+      addToast('请填写模板名称和内容', 'warning');
       return;
     }
 

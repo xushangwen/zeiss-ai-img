@@ -29,6 +29,7 @@ export function ThumbnailGrid() {
     setAspectRatio,
     useCustomPrompt,
     finalPrompt,
+    addToast,
   } = useStore();
 
   const { generateImages, generateWithCustomPrompt, isLoading, error } = useGemini();
@@ -40,12 +41,12 @@ export function ThumbnailGrid() {
 
   const handleGenerate = async () => {
     if (!currentTaskId && !useCustomPrompt) {
-      alert('请先选择一个任务或使用自定义提示词');
+      addToast('请先选择一个任务或使用自定义提示词', 'warning');
       return;
     }
 
     if (useCustomPrompt && !finalPrompt.trim()) {
-      alert('提示词不能为空');
+      addToast('提示词不能为空', 'warning');
       return;
     }
 

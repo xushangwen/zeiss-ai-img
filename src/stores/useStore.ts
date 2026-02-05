@@ -37,6 +37,9 @@ export const useStore = create<AppState>()(
       isAnalyzing: false,
       aspectRatio: '1:1',
 
+      // Toast 通知
+      toasts: [],
+
       // === Actions ===
 
       setCurrentView: (view) => set({ currentView: view }),
@@ -161,10 +164,25 @@ export const useStore = create<AppState>()(
           isGenerating: false,
           isAnalyzing: false,
           aspectRatio: '1:1',
+          toasts: [],
         });
 
         // 刷新页面以确保完全重置
         window.location.reload();
+      },
+
+      // Toast 通知方法
+      addToast: (message, type = 'info', duration = 3000) => {
+        const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        set((state) => ({
+          toasts: [...state.toasts, { id, type, message, duration }],
+        }));
+      },
+
+      removeToast: (id) => {
+        set((state) => ({
+          toasts: state.toasts.filter((toast) => toast.id !== id),
+        }));
       },
     }),
     {

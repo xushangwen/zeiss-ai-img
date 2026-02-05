@@ -57,7 +57,8 @@ export function ReferenceUpload() {
     personInfo,
     setPersonInfo,
     isAnalyzing,
-    setIsAnalyzing
+    setIsAnalyzing,
+    addToast,
   } = useStore();
   const [isDragging, setIsDragging] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -65,7 +66,7 @@ export function ReferenceUpload() {
   const handleFile = useCallback(
     async (file: File) => {
       if (!file.type.startsWith('image/')) {
-        alert('请上传图片文件');
+        addToast('请上传图片文件', 'warning');
         return;
       }
 
@@ -88,12 +89,12 @@ export function ReferenceUpload() {
         }
       } catch (err) {
         console.error('图片压缩失败:', err);
-        alert('图片处理失败，请重试');
+        addToast('图片处理失败，请重试', 'error');
       } finally {
         setIsCompressing(false);
       }
     },
-    [setReferenceImage, setPersonInfo, setIsAnalyzing]
+    [setReferenceImage, setPersonInfo, setIsAnalyzing, addToast]
   );
 
   const handleDrop = useCallback(
