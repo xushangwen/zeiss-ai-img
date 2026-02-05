@@ -84,6 +84,7 @@ export interface AppState {
   // 任务相关（只存储基本信息，不存储图片）
   tasks: Task[];
   currentTaskId: string | null;
+  taskStates: Record<string, TaskStatus>;  // 持久化任务状态
 
   // 模板相关
   templates: PromptTemplate[];

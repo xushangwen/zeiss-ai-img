@@ -13,9 +13,10 @@ export const useStore = create<AppState>()(
       // 当前视图
       currentView: 'workspace',
 
-      // 任务（使用默认数据，不持久化）
+      // 任务（使用默认数据，但状态会持久化）
       tasks: zeissTasks,
       currentTaskId: null,
+      taskStates: {},  // 持久化的任务状态
 
       // 模板（使用默认数据）
       templates: defaultTemplates,
@@ -51,6 +52,7 @@ export const useStore = create<AppState>()(
           tasks: state.tasks.map((t) =>
             t.id === taskId ? { ...t, status } : t
           ),
+          taskStates: { ...state.taskStates, [taskId]: status },
         })),
 
       setReferenceImage: (image) => set({ referenceImage: image }),
@@ -140,6 +142,7 @@ export const useStore = create<AppState>()(
           currentView: 'workspace',
           tasks: zeissTasks,
           currentTaskId: null,
+          taskStates: {},
           templates: defaultTemplates,
           gallery: [],
           referenceImage: null,
@@ -162,7 +165,18 @@ export const useStore = create<AppState>()(
       partialize: (state) => ({
         gallery: state.gallery,
         aspectRatio: state.aspectRatio,
+        taskStates: state.taskStates,  // 持久化任务状态
       }),
+      // 从持久化数据恢复后，合并任务状态
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // 将持久化的状态应用到任务上
+          state.tasks = state.tasks.map((task) => ({
+            ...task,
+            status: state.taskStates[task.id] || task.status,
+          }));
+        }
+      },
     }
   )
 );

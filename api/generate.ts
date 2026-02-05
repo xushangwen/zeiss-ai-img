@@ -108,18 +108,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 function buildPrompt(personDescription: string | undefined, taskDescription: string, hasReference: boolean): string {
   let prompt = '';
 
+  // 核心摄影风格要求（放在最前面，强调优先级）
+  prompt += `摄影风格要求：
+- 必须是真实照片级别的摄影作品（photorealistic photography）
+- 专业医疗说明图风格
+- 使用专业相机拍摄的效果
+- 禁止任何插画、卡通、手绘、艺术化风格
+- 禁止风格化处理
+
+`;
+
   if (personDescription) {
     prompt += `人物特征：${personDescription}\n\n`;
   }
 
   prompt += `场景要求：${taskDescription}\n\n`;
 
-  prompt += `图片要求：
-- 专业医疗说明图风格
-- 清晰的人物特写
+  prompt += `技术要求：
+- 清晰的人物特写，焦点准确
 - 简洁的白色或浅灰色背景
-- 柔和自然的光线
-- 图片中不要出现任何文字、标签或水印`;
+- 柔和自然的光线，避免强烈阴影
+- 图片中不要出现任何文字、标签或水印
+- 人物动作和手部位置必须符合物理逻辑
+- 如果涉及手部动作，手指不能穿过镜片或其他物体
+- 眼镜必须正确佩戴在脸上，不能悬空或穿透皮肤`;
 
   if (hasReference) {
     prompt += '\n- 人物外貌请严格参考上传的参考图，保持高度一致性';
