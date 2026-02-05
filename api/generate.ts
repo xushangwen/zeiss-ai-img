@@ -57,12 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           body: JSON.stringify({
             contents,
             generationConfig: {
-              responseModalities: ['IMAGE'],
-              // 2K 尺寸配置
-              imageConfig: {
-                imageSize: '2K',
-                aspectRatio: aspectRatio,
-              },
+              responseModalities: ['TEXT', 'IMAGE'],
             },
           }),
         }
