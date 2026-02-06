@@ -25,15 +25,15 @@ export function Toast({ id, type, message, duration = 3000, onClose }: ToastProp
   };
 
   const colors = {
-    success: 'bg-success/10 border-success text-success',
-    error: 'bg-error/10 border-error text-error',
-    info: 'bg-accent/10 border-accent text-accent',
-    warning: 'bg-warning/10 border-warning text-warning',
+    success: 'border-success/30 text-success',
+    error: 'border-error/30 text-error',
+    info: 'border-accent/30 text-accent',
+    warning: 'border-warning/30 text-warning',
   };
 
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-sm ${colors[type]} animate-slide-in-right`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl border glass ${colors[type]} animate-slide-in-right shadow-card`}
     >
       <i className={`${icons[type]} text-lg`}></i>
       <span className="text-sm font-medium">{message}</span>

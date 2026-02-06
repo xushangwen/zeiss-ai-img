@@ -35,7 +35,6 @@ export function ThumbnailGrid() {
   const { generateImages, generateWithCustomPrompt, isLoading, error } = useGemini();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-  // 获取当前任务描述
   const currentTask = tasks.find((t) => t.id === currentTaskId);
   const taskDescription = currentTask?.description || '';
 
@@ -59,7 +58,6 @@ export function ThumbnailGrid() {
       let images;
 
       if (useCustomPrompt) {
-        // 使用自定义提示词生图
         images = await generateWithCustomPrompt(
           finalPrompt,
           referenceImage || undefined,
@@ -67,7 +65,6 @@ export function ThumbnailGrid() {
           1
         );
       } else {
-        // 使用自动组合的提示词生图
         images = await generateImages(
           taskDescription,
           personInfo,
@@ -77,7 +74,6 @@ export function ThumbnailGrid() {
         );
       }
 
-      // 追加到现有图片列表，而不是替换
       setThumbnails([...thumbnails, ...images]);
       selectThumbnail(null);
       if (currentTaskId) {
@@ -102,36 +98,38 @@ export function ThumbnailGrid() {
   const loading = isGenerating || isLoading;
 
   return (
-    <div className="bg-bg-card rounded-card p-4 border border-border">
+    <div className="bg-bg-card rounded-card p-4 border border-border hover:border-border-light transition-colors">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-text-primary flex items-center gap-2">
-          <i className="ri-image-line text-accent"></i>
+          <div className="w-6 h-6 rounded-md bg-accent/10 flex items-center justify-center">
+            <i className="ri-image-line text-accent text-xs"></i>
+          </div>
           图片生成
         </h3>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           {thumbnails.length > 0 && (
             <button
               onClick={() => setThumbnails([])}
               disabled={loading}
-              className="px-3 py-1.5 bg-bg-primary hover:bg-border disabled:opacity-50 disabled:cursor-not-allowed text-text-secondary text-sm rounded-lg flex items-center gap-2 transition-colors"
+              className="px-3 py-1.5 bg-bg-primary hover:bg-bg-elevated disabled:opacity-40 disabled:cursor-not-allowed text-text-secondary text-xs rounded-btn flex items-center gap-1.5 transition-all duration-200 border border-transparent hover:border-border-light"
             >
-              <i className="ri-delete-bin-line"></i>
+              <i className="ri-delete-bin-line text-[12px]"></i>
               清空
             </button>
           )}
           <button
             onClick={handleGenerate}
             disabled={loading || (!currentTaskId && !useCustomPrompt)}
-            className="px-3 py-1.5 bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm rounded-lg flex items-center gap-2 transition-colors"
+            className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs rounded-btn flex items-center gap-2 transition-all duration-200 shadow-glow hover:shadow-glow-strong"
           >
             {loading ? (
               <>
-                <i className="ri-loader-4-line animate-spin"></i>
+                <i className="ri-loader-4-line animate-spin text-sm"></i>
                 生成中...
               </>
             ) : (
               <>
-                <i className="ri-magic-line"></i>
+                <i className="ri-magic-line text-sm"></i>
                 {useCustomPrompt ? '用模板生图' : '生成图片'}
               </>
             )}
@@ -141,19 +139,19 @@ export function ThumbnailGrid() {
 
       {/* 比例选择 */}
       <div className="mb-3">
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-1.5 flex-wrap">
           {ASPECT_RATIOS.map((ratio) => (
             <button
               key={ratio.value}
               onClick={() => setAspectRatio(ratio.value)}
-              className={`px-3 py-1.5 text-xs rounded-lg flex items-center gap-1.5 transition-colors ${
+              className={`px-3 py-1.5 text-xs rounded-btn flex items-center gap-1.5 transition-all duration-200 ${
                 aspectRatio === ratio.value
-                  ? 'bg-accent text-white'
-                  : 'bg-bg-primary text-text-secondary hover:text-text-primary'
+                  ? 'bg-accent/15 text-accent border border-accent/30'
+                  : 'bg-bg-primary text-text-tertiary hover:text-text-secondary border border-transparent hover:border-border-light'
               }`}
             >
-              <i className={ratio.icon}></i>
-              {ratio.label}
+              <i className={`${ratio.icon} text-[12px]`}></i>
+              <span className="font-mono">{ratio.label}</span>
             </button>
           ))}
         </div>
@@ -161,7 +159,7 @@ export function ThumbnailGrid() {
 
       {/* 当前任务描述预览 */}
       {currentTask && !useCustomPrompt && (
-        <div className="mb-3 p-2 bg-bg-primary rounded-lg text-xs text-text-secondary">
+        <div className="mb-3 p-2.5 bg-bg-primary rounded-xl text-xs text-text-secondary border border-border">
           <span className="text-text-primary font-medium">{currentTask.title}：</span>
           {taskDescription.slice(0, 80)}...
         </div>
@@ -169,14 +167,14 @@ export function ThumbnailGrid() {
 
       {/* 自定义提示词模式提示 */}
       {useCustomPrompt && (
-        <div className="mb-3 p-2 bg-accent/10 border border-accent/30 rounded-lg text-xs text-accent flex items-center gap-2">
+        <div className="mb-3 p-2.5 bg-accent/5 border border-accent/20 rounded-xl text-xs text-accent flex items-center gap-2">
           <i className="ri-magic-line"></i>
           <span>使用自定义提示词模式，参考图仅作为图片参考</span>
         </div>
       )}
 
       {error && (
-        <div className="mb-3 p-2 bg-error/10 border border-error/30 rounded-lg text-sm text-error">
+        <div className="mb-3 p-2.5 bg-error/5 border border-error/20 rounded-xl text-sm text-error">
           {error}
         </div>
       )}
@@ -187,10 +185,10 @@ export function ThumbnailGrid() {
           thumbnails.map((img, index) => (
             <div
               key={img.id}
-              className={`relative group rounded-lg overflow-hidden border transition-all ${
+              className={`relative group rounded-xl overflow-hidden border transition-all duration-200 ${
                 selectedThumbnailId === img.id
-                  ? 'border-accent ring-1 ring-accent/30'
-                  : 'border-border hover:border-accent/50'
+                  ? 'border-accent/50 shadow-glow'
+                  : 'border-border hover:border-border-light'
               }`}
             >
               <button
@@ -200,30 +198,32 @@ export function ThumbnailGrid() {
                 <img src={img.url} alt="" className="block w-full object-cover aspect-square" />
               </button>
               {selectedThumbnailId === img.id && (
-                <div className="absolute top-1 right-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
-                  <i className="ri-check-line text-white text-xs"></i>
+                <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-accent rounded-md flex items-center justify-center shadow-glow">
+                  <i className="ri-check-line text-white text-[10px]"></i>
                 </div>
               )}
-              <div className="absolute bottom-1 left-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-bg-primary/90 to-transparent flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-y-1 group-hover:translate-y-0">
                 <button
                   onClick={() => setPreviewImage(img.url)}
-                  className="flex-1 py-1 bg-bg-primary/90 text-text-primary text-xs rounded flex items-center justify-center hover:bg-bg-primary"
+                  className="flex-1 py-1 glass text-text-primary text-xs rounded-md flex items-center justify-center hover:bg-bg-elevated/80"
                 >
-                  <i className="ri-zoom-in-line text-[11px]"></i>
+                  <i className="ri-zoom-in-line text-[12px]"></i>
                 </button>
                 <button
                   onClick={() => handleDownload(img.url, index)}
-                  className="flex-1 py-1 bg-accent/90 text-white text-xs rounded flex items-center justify-center hover:bg-accent"
+                  className="flex-1 py-1 bg-accent/80 text-white text-xs rounded-md flex items-center justify-center hover:bg-accent"
                 >
-                  <i className="ri-download-line text-[11px]"></i>
+                  <i className="ri-download-line text-[12px]"></i>
                 </button>
               </div>
             </div>
           ))
         ) : (
-          <div className="col-span-3 h-32 flex flex-col items-center justify-center text-text-secondary">
-            <i className="ri-image-add-line text-4xl mb-2"></i>
-            <span className="text-sm">
+          <div className="col-span-3 h-32 flex flex-col items-center justify-center text-text-tertiary">
+            <div className="w-12 h-12 rounded-xl bg-bg-primary flex items-center justify-center mb-3">
+              <i className="ri-image-add-line text-xl"></i>
+            </div>
+            <span className="text-xs">
               {useCustomPrompt
                 ? '点击生成按钮使用自定义提示词生图'
                 : currentTaskId
@@ -237,18 +237,18 @@ export function ThumbnailGrid() {
       {/* 图片预览弹窗 */}
       {previewImage && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setPreviewImage(null)}
         >
-          <div className="relative max-w-4xl max-h-[90vh]">
+          <div className="relative max-w-4xl max-h-[90vh] animate-scale-in">
             <img
               src={previewImage}
               alt=""
-              className="max-w-full max-h-[90vh] object-contain rounded-lg"
+              className="max-w-full max-h-[90vh] object-contain rounded-xl"
             />
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-4 right-4 w-10 h-10 bg-bg-primary/80 rounded-full flex items-center justify-center text-text-primary hover:bg-bg-primary"
+              className="absolute top-4 right-4 w-10 h-10 glass rounded-xl flex items-center justify-center text-text-primary hover:bg-bg-elevated transition-colors"
             >
               <i className="ri-close-line text-xl"></i>
             </button>

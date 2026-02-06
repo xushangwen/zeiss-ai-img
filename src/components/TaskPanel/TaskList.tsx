@@ -24,18 +24,20 @@ export function TaskList() {
   ];
 
   return (
-    <div className="w-72 bg-bg-card border-r border-border overflow-y-auto">
+    <div className="w-72 bg-bg-card/50 border-r border-border overflow-y-auto">
       <div className="p-4 border-b border-border">
         <h3 className="text-sm font-medium text-text-primary flex items-center gap-2">
-          <i className="ri-list-check text-accent"></i>
+          <div className="w-6 h-6 rounded-md bg-accent/10 flex items-center justify-center">
+            <i className="ri-list-check text-accent text-xs"></i>
+          </div>
           任务清单
         </h3>
-        <p className="text-xs text-text-secondary mt-1">
+        <p className="text-[12px] text-text-tertiary mt-1.5 pl-8">
           共 {tasks.length} 个任务
         </p>
       </div>
 
-      <div className="p-3 space-y-4">
+      <div className="p-3 space-y-5">
         {partOrder.map((part) => {
           const partTasks = groupedTasks[part];
           if (!partTasks) return null;
@@ -45,16 +47,24 @@ export function TaskList() {
           ).length;
 
           return (
-            <div key={part}>
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-xs font-medium text-text-secondary uppercase tracking-wider">
+            <div key={part} className="animate-fade-in">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <h4 className="text-[10px] font-medium text-text-tertiary uppercase tracking-widest">
                   {partNames[part]}
                 </h4>
-                <span className="text-xs text-text-secondary font-mono">
-                  {completedCount}/{partTasks.length}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1 w-8 bg-bg-primary rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-accent rounded-full transition-all duration-500"
+                      style={{ width: `${(completedCount / partTasks.length) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-text-tertiary font-mono">
+                    {completedCount}/{partTasks.length}
+                  </span>
+                </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {partTasks.map((task) => (
                   <TaskCard
                     key={task.id}

@@ -62,7 +62,6 @@ export function TemplateList() {
     });
   };
 
-  // 从内容中提取变量
   const extractVariables = (content: string): string[] => {
     const matches = content.match(/\{([^}]+)\}/g);
     if (!matches) return [];
@@ -73,14 +72,14 @@ export function TemplateList() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-semibold text-text-primary">提示词模板</h2>
-          <p className="text-sm text-text-secondary mt-1">
+          <h2 className="text-xl font-semibold text-text-primary font-display">提示词模板</h2>
+          <p className="text-xs text-text-tertiary mt-1">
             管理和编辑图片生成提示词模板
           </p>
         </div>
         <button
           onClick={handleNew}
-          className="px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg flex items-center gap-2 transition-colors"
+          className="px-4 py-2 bg-accent hover:bg-accent-hover text-white text-xs rounded-btn flex items-center gap-2 transition-all duration-200 shadow-glow hover:shadow-glow-strong"
         >
           <i className="ri-add-line"></i>
           新建模板
@@ -89,14 +88,14 @@ export function TemplateList() {
 
       {/* 编辑表单 */}
       {editingId && (
-        <div className="mb-6 p-4 bg-bg-card rounded-card border border-border">
+        <div className="mb-6 p-5 bg-bg-card rounded-card border border-border-light animate-slide-up">
           <h3 className="text-sm font-medium text-text-primary mb-4">
             {editingId === 'new' ? '新建模板' : '编辑模板'}
           </h3>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-text-secondary mb-1">
+                <label className="block text-[12px] text-text-tertiary mb-1.5 uppercase tracking-wider">
                   模板名称
                 </label>
                 <input
@@ -105,12 +104,12 @@ export function TemplateList() {
                   onChange={(e) =>
                     setEditForm({ ...editForm, name: e.target.value })
                   }
-                  className="w-full px-3 py-2 bg-bg-primary border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                  className="w-full px-3 py-2.5 bg-bg-primary border border-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent/50 focus:shadow-glow transition-all"
                   placeholder="输入模板名称"
                 />
               </div>
               <div>
-                <label className="block text-xs text-text-secondary mb-1">
+                <label className="block text-[12px] text-text-tertiary mb-1.5 uppercase tracking-wider">
                   分类
                 </label>
                 <select
@@ -121,7 +120,7 @@ export function TemplateList() {
                       category: e.target.value as TaskPart | 'general',
                     })
                   }
-                  className="w-full px-3 py-2 bg-bg-primary border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                  className="w-full px-3 py-2.5 bg-bg-primary border border-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent/50 transition-all"
                 >
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>
@@ -132,7 +131,7 @@ export function TemplateList() {
               </div>
             </div>
             <div>
-              <label className="block text-xs text-text-secondary mb-1">
+              <label className="block text-[12px] text-text-tertiary mb-1.5 uppercase tracking-wider">
                 模板内容
               </label>
               <textarea
@@ -140,12 +139,12 @@ export function TemplateList() {
                 onChange={(e) =>
                   setEditForm({ ...editForm, content: e.target.value })
                 }
-                className="w-full h-32 px-3 py-2 bg-bg-primary border border-border rounded-lg text-sm text-text-primary resize-none focus:outline-none focus:border-accent"
+                className="w-full h-32 px-3 py-2.5 bg-bg-primary border border-border rounded-xl text-sm text-text-primary resize-none focus:outline-none focus:border-accent/50 focus:shadow-glow transition-all font-mono"
                 placeholder="输入提示词模板，使用 {变量名} 格式插入变量"
               />
             </div>
             {editForm.content && (
-              <div className="text-xs text-text-secondary">
+              <div className="text-[12px] text-text-tertiary">
                 <span className="text-accent">检测到的变量：</span>
                 {extractVariables(editForm.content).join(', ') || '无'}
               </div>
@@ -153,13 +152,13 @@ export function TemplateList() {
             <div className="flex justify-end gap-2">
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors"
+                className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors text-sm"
               >
                 取消
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-btn transition-all duration-200 text-sm"
               >
                 保存
               </button>
@@ -173,35 +172,35 @@ export function TemplateList() {
         {templates.map((template) => (
           <div
             key={template.id}
-            className="bg-bg-card rounded-card p-4 border border-border hover:border-accent/50 transition-colors"
+            className="bg-bg-card rounded-card p-4 border border-border hover:border-accent/30 hover:shadow-card-hover transition-all duration-300 group"
           >
             <div className="flex items-start justify-between mb-2">
               <div>
                 <h4 className="text-sm font-medium text-text-primary">
                   {template.name}
                 </h4>
-                <span className="text-xs text-accent">
+                <span className="text-[10px] text-accent font-mono uppercase tracking-wider">
                   {categoryNames[template.category]}
                 </span>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleEdit(template)}
-                  className="p-1.5 text-text-secondary hover:text-accent transition-colors"
+                  className="p-1.5 text-text-tertiary hover:text-accent transition-colors rounded-md hover:bg-accent/10"
                 >
-                  <i className="ri-edit-line"></i>
+                  <i className="ri-edit-line text-sm"></i>
                 </button>
                 {!template.isDefault && (
                   <button
                     onClick={() => deleteTemplate(template.id)}
-                    className="p-1.5 text-text-secondary hover:text-error transition-colors"
+                    className="p-1.5 text-text-tertiary hover:text-error transition-colors rounded-md hover:bg-error/10"
                   >
-                    <i className="ri-delete-bin-line"></i>
+                    <i className="ri-delete-bin-line text-sm"></i>
                   </button>
                 )}
               </div>
             </div>
-            <p className="text-xs text-text-secondary line-clamp-3 mb-2">
+            <p className="text-[12px] text-text-tertiary line-clamp-3 mb-3 leading-relaxed">
               {template.content}
             </p>
             {template.variables.length > 0 && (
@@ -209,7 +208,7 @@ export function TemplateList() {
                 {template.variables.map((v) => (
                   <span
                     key={v}
-                    className="px-1.5 py-0.5 bg-accent/20 text-accent text-xs rounded"
+                    className="px-2 py-0.5 bg-accent/8 text-accent text-[10px] rounded-md font-mono"
                   >
                     {v}
                   </span>

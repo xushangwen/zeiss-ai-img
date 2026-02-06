@@ -123,28 +123,30 @@ export function PromptEditor() {
   }
 
   return (
-    <div className="bg-bg-card rounded-card p-4 border border-border">
+    <div className="bg-bg-card rounded-card p-4 border border-border hover:border-border-light transition-colors">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-text-primary flex items-center gap-2">
-          <i className="ri-file-text-line text-accent"></i>
+          <div className="w-6 h-6 rounded-md bg-accent/10 flex items-center justify-center">
+            <i className="ri-file-text-line text-accent text-xs"></i>
+          </div>
           提示词管理
         </h3>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           {!isEditing ? (
             <>
               <button
                 onClick={handlePreview}
-                className="px-3 py-1.5 bg-bg-primary hover:bg-border text-text-secondary text-xs rounded-lg flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 bg-bg-primary hover:bg-bg-elevated text-text-secondary text-xs rounded-btn flex items-center gap-1.5 transition-all duration-200 border border-transparent hover:border-border-light"
               >
-                <i className="ri-eye-line"></i>
-                预览提示词
+                <i className="ri-eye-line text-[12px]"></i>
+                预览
               </button>
               {useCustomPrompt && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-3 py-1.5 bg-accent hover:bg-accent-hover text-white text-xs rounded-lg flex items-center gap-1.5 transition-colors"
+                  className="px-3 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent text-xs rounded-btn flex items-center gap-1.5 transition-all duration-200"
                 >
-                  <i className="ri-edit-line"></i>
+                  <i className="ri-edit-line text-[12px]"></i>
                   编辑
                 </button>
               )}
@@ -153,20 +155,20 @@ export function PromptEditor() {
             <>
               <button
                 onClick={handleCancel}
-                className="px-3 py-1.5 bg-bg-primary hover:bg-border text-text-secondary text-xs rounded-lg transition-colors"
+                className="px-3 py-1.5 bg-bg-primary hover:bg-bg-elevated text-text-secondary text-xs rounded-btn transition-all duration-200"
               >
                 取消
               </button>
               <button
                 onClick={() => setShowSaveDialog(true)}
-                className="px-3 py-1.5 bg-bg-primary hover:bg-border text-text-secondary text-xs rounded-lg flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 bg-bg-primary hover:bg-bg-elevated text-text-secondary text-xs rounded-btn flex items-center gap-1.5 transition-all duration-200 border border-transparent hover:border-border-light"
               >
-                <i className="ri-save-line"></i>
+                <i className="ri-save-line text-[12px]"></i>
                 存为模板
               </button>
               <button
                 onClick={handleSave}
-                className="px-3 py-1.5 bg-success hover:bg-success/90 text-white text-xs rounded-lg transition-colors"
+                className="px-3 py-1.5 bg-success/15 hover:bg-success/25 text-success text-xs rounded-btn transition-all duration-200"
               >
                 保存修改
               </button>
@@ -201,12 +203,12 @@ export function PromptEditor() {
             value={finalPrompt}
             onChange={(e) => setFinalPrompt(e.target.value)}
             readOnly={!isEditing}
-            className={`w-full h-64 px-3 py-2 bg-bg-primary border border-border rounded-lg text-xs text-text-primary font-mono leading-relaxed resize-none focus:outline-none focus:border-accent ${
+            className={`w-full h-64 px-3 py-2.5 bg-bg-primary border border-border rounded-xl text-xs text-text-primary font-mono leading-relaxed resize-none focus:outline-none focus:border-accent/50 focus:shadow-glow transition-all ${
               !isEditing ? 'cursor-default' : ''
             }`}
             placeholder="提示词内容"
           />
-          <div className="text-xs text-text-secondary">
+          <div className="text-[12px] text-text-tertiary font-mono">
             字符数：{finalPrompt.length}
           </div>
         </div>
@@ -214,15 +216,15 @@ export function PromptEditor() {
 
       {/* 保存为模板对话框 */}
       {showSaveDialog && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-bg-card rounded-card p-6 max-w-md w-full border border-border">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-bg-card rounded-card p-6 max-w-md w-full border border-border-light shadow-card-hover animate-scale-in">
             <h3 className="text-lg font-medium text-text-primary mb-4">保存为模板</h3>
             <input
               type="text"
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
               placeholder="输入模板名称"
-              className="w-full px-3 py-2 bg-bg-primary border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent mb-4"
+              className="w-full px-3 py-2.5 bg-bg-primary border border-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent/50 focus:shadow-glow mb-4 transition-all"
               autoFocus
             />
             <div className="flex gap-2 justify-end">
@@ -231,13 +233,13 @@ export function PromptEditor() {
                   setShowSaveDialog(false);
                   setTemplateName('');
                 }}
-                className="px-4 py-2 bg-bg-primary hover:bg-border text-text-secondary text-sm rounded-lg transition-colors"
+                className="px-4 py-2 bg-bg-primary hover:bg-bg-elevated text-text-secondary text-sm rounded-btn transition-all duration-200"
               >
                 取消
               </button>
               <button
                 onClick={handleSaveAsTemplate}
-                className="px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm rounded-lg transition-colors"
+                className="px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm rounded-btn transition-all duration-200"
               >
                 保存
               </button>

@@ -1,5 +1,5 @@
-/* 字体导入 - 必须在最前面 */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+SC:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+/* 字体导入 */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+SC:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Google+Sans:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -17,9 +17,9 @@ html, body, #root {
 }
 
 body {
-  font-family: 'IBM Plex Sans SC', sans-serif;
-  background-color: #0a0a0a;
-  color: #fafafa;
+  font-family: 'IBM Plex Sans SC', system-ui, sans-serif;
+  background-color: #0f1117;
+  color: #f0f2f8;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -33,35 +33,92 @@ input[type="number"] {
 
 /* 滚动条样式 */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3a3a3a;
-  border-radius: 4px;
+  background: #353b54;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4a4a4a;
+  background: #4a5173;
 }
 
 /* Toast 动画 */
 @keyframes slide-in-right {
   from {
-    transform: translateX(100%);
+    transform: translateX(100%) scale(0.95);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
     opacity: 1;
   }
 }
 
 .animate-slide-in-right {
-  animation: slide-in-right 0.3s ease-out;
+  animation: slide-in-right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 毛玻璃效果 */
+.glass {
+  background: rgba(24, 27, 37, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.glass-light {
+  background: rgba(24, 27, 37, 0.45);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+/* 微光边框效果 */
+.border-glow {
+  position: relative;
+}
+
+.border-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(43,125,233,0.3), transparent 50%, rgba(43,125,233,0.15));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 精致噪点纹理 - SVG feTurbulence 方案 */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 120px 120px;
+  mix-blend-mode: overlay;
+}
+
+/* 脉冲动画 */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
 }

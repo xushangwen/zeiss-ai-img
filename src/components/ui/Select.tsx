@@ -33,22 +33,22 @@ export function Select({ label, value, options, onChange, placeholder = '请选�
   return (
     <div className={`w-full ${className}`} ref={ref}>
       {label && (
-        <label className="text-xs text-text-secondary mb-2 block">{label}</label>
+        <label className="text-[10px] text-text-tertiary mb-1.5 block uppercase tracking-wider font-medium">{label}</label>
       )}
       <div className="relative">
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2 bg-bg-primary border border-border rounded-lg text-sm text-left cursor-pointer transition-colors hover:border-accent/50 focus:outline-none focus:border-accent flex items-center justify-between gap-2"
+          className="w-full px-3 py-2 bg-bg-primary border border-border rounded-xl text-sm text-left cursor-pointer transition-all duration-200 hover:border-border-light focus:outline-none focus:border-accent/50 focus:shadow-glow flex items-center justify-between gap-2"
         >
-          <span className={selectedOption ? 'text-text-primary' : 'text-text-secondary'}>
+          <span className={selectedOption ? 'text-text-primary' : 'text-text-tertiary'}>
             {selectedOption?.label || placeholder}
           </span>
-          <i className={`ri-arrow-down-s-line text-text-secondary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}></i>
+          <i className={`ri-arrow-down-s-line text-text-tertiary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}></i>
         </button>
 
         {isOpen && (
-          <div className="absolute z-50 mt-1 w-full bg-bg-card border border-border rounded-lg shadow-lg overflow-hidden">
+          <div className="absolute z-50 mt-1.5 w-full glass border border-border-light rounded-xl shadow-card-hover overflow-hidden animate-scale-in">
             <div className="max-h-60 overflow-y-auto py-1">
               {options.map((option) => (
                 <button
@@ -58,10 +58,10 @@ export function Select({ label, value, options, onChange, placeholder = '请选�
                     onChange(option.value);
                     setIsOpen(false);
                   }}
-                  className={`w-full px-3 py-2 text-sm text-left transition-colors flex items-center gap-2 ${
+                  className={`w-full px-3 py-2 text-sm text-left transition-all duration-150 flex items-center gap-2 ${
                     option.value === value
                       ? 'bg-accent/10 text-accent font-medium'
-                      : 'text-text-primary hover:bg-bg-primary'
+                      : 'text-text-primary hover:bg-bg-hover'
                   }`}
                 >
                   {option.value === value && (
