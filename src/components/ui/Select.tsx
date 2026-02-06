@@ -39,7 +39,7 @@ export function Select({ label, value, options, onChange, placeholder = '请选�
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2 bg-bg-primary border border-border rounded-xl text-sm text-left cursor-pointer transition-all duration-200 hover:border-border-light focus:outline-none focus:border-accent/50 focus:shadow-glow flex items-center justify-between gap-2"
+          className="w-full px-3 py-2.5 bg-bg-primary border border-border rounded-xl text-sm text-left cursor-pointer transition-all duration-200 hover:border-border-light focus:outline-none focus:border-accent/50 focus:shadow-glow flex items-center justify-between gap-2"
         >
           <span className={selectedOption ? 'text-text-primary' : 'text-text-tertiary'}>
             {selectedOption?.label || placeholder}
@@ -48,7 +48,7 @@ export function Select({ label, value, options, onChange, placeholder = '请选�
         </button>
 
         {isOpen && (
-          <div className="absolute z-50 mt-1.5 w-full glass border border-border-light rounded-xl shadow-card-hover overflow-hidden animate-scale-in">
+          <div className="absolute z-50 mt-1.5 right-0 min-w-full w-max glass border border-border-light rounded-xl shadow-card-hover overflow-hidden animate-scale-in">
             <div className="max-h-60 overflow-y-auto py-1">
               {options.map((option) => (
                 <button
@@ -58,7 +58,7 @@ export function Select({ label, value, options, onChange, placeholder = '请选�
                     onChange(option.value);
                     setIsOpen(false);
                   }}
-                  className={`w-full px-3 py-2 text-sm text-left transition-all duration-150 flex items-center gap-2 ${
+                  className={`w-full px-3 py-2 text-left transition-all duration-150 flex items-center gap-2 whitespace-nowrap ${
                     option.value === value
                       ? 'bg-accent/10 text-accent font-medium'
                       : 'text-text-primary hover:bg-bg-hover'
@@ -67,7 +67,7 @@ export function Select({ label, value, options, onChange, placeholder = '请选�
                   {option.value === value && (
                     <i className="ri-check-line text-accent text-xs"></i>
                   )}
-                  <span className={option.value === value ? '' : 'pl-5'}>{option.label}</span>
+                  <span className={`whitespace-nowrap text-[13px] ${option.value === value ? '' : 'pl-5'}`}>{option.label}</span>
                 </button>
               ))}
             </div>

@@ -109,7 +109,7 @@ export function Gallery() {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-6">
+    <div className="h-full overflow-y-auto overflow-x-hidden p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-semibold text-text-primary font-display">图库</h2>
@@ -236,7 +236,7 @@ export function Gallery() {
               <p className="text-sm text-text-primary mb-2">
                 {getTaskName(selectedImage.taskId)}
               </p>
-              <p className="text-xs text-text-tertiary line-clamp-2">
+              <p className="text-xs text-text-tertiary break-words max-h-24 overflow-y-auto">
                 {selectedImage.prompt}
               </p>
               <div className="flex items-center gap-3 mt-2 text-[12px] text-text-tertiary font-mono">

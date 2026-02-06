@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../../stores/useStore';
+import { Select } from '../ui/Select';
 import type { PromptTemplate, TaskPart } from '../../types';
 import { partNames } from '../../data/zeissRequirements';
 
@@ -112,22 +113,19 @@ export function TemplateList() {
                 <label className="block text-[12px] text-text-tertiary mb-1.5 uppercase tracking-wider">
                   分类
                 </label>
-                <select
+                <Select
                   value={editForm.category || 'general'}
-                  onChange={(e) =>
+                  options={categories.map((cat) => ({
+                    value: cat,
+                    label: categoryNames[cat],
+                  }))}
+                  onChange={(value) =>
                     setEditForm({
                       ...editForm,
-                      category: e.target.value as TaskPart | 'general',
+                      category: value as TaskPart | 'general',
                     })
                   }
-                  className="w-full px-3 py-2.5 bg-bg-primary border border-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent/50 transition-all"
-                >
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {categoryNames[cat]}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
             </div>
             <div>
@@ -186,14 +184,14 @@ export function TemplateList() {
               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleEdit(template)}
-                  className="p-1.5 text-text-tertiary hover:text-accent transition-colors rounded-md hover:bg-accent/10"
+                  className="w-7 h-7 flex items-center justify-center text-text-tertiary hover:text-accent transition-colors rounded-md hover:bg-accent/10"
                 >
                   <i className="ri-edit-line text-sm"></i>
                 </button>
                 {!template.isDefault && (
                   <button
                     onClick={() => deleteTemplate(template.id)}
-                    className="p-1.5 text-text-tertiary hover:text-error transition-colors rounded-md hover:bg-error/10"
+                    className="w-7 h-7 flex items-center justify-center text-text-tertiary hover:text-error transition-colors rounded-md hover:bg-error/10"
                   >
                     <i className="ri-delete-bin-line text-sm"></i>
                   </button>
