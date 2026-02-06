@@ -52,14 +52,21 @@ export function TaskList() {
                 <h4 className="text-[10px] font-medium text-text-tertiary uppercase tracking-widest">
                   {partNames[part]}
                 </h4>
-                <div className="flex items-center gap-1.5">
-                  <div className="h-1 w-8 bg-bg-primary rounded-full overflow-hidden">
+                <div className="flex items-center gap-2">
+                  {/* 优化后的进度条 */}
+                  <div className="h-1.5 w-12 bg-bg-primary/80 rounded-full overflow-hidden ring-1 ring-border-light/50">
                     <div
-                      className="h-full bg-accent rounded-full transition-all duration-500"
+                      className={`h-full rounded-full transition-all duration-700 ease-out ${
+                        completedCount === partTasks.length
+                          ? 'bg-gradient-to-r from-success to-emerald-400'
+                          : 'bg-gradient-to-r from-accent to-accent-light'
+                      }`}
                       style={{ width: `${(completedCount / partTasks.length) * 100}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-text-tertiary font-mono">
+                  <span className={`text-[10px] font-mono tabular-nums ${
+                    completedCount === partTasks.length ? 'text-success' : 'text-text-tertiary'
+                  }`}>
                     {completedCount}/{partTasks.length}
                   </span>
                 </div>

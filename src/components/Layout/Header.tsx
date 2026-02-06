@@ -13,7 +13,14 @@ export function Header() {
   const current = titles[currentView];
 
   return (
-    <header className="h-14 glass border-b border-border flex items-center justify-between px-6 relative">
+    <header
+      className="h-14 glass border-b border-border flex items-center justify-between px-6 relative"
+      style={{
+        background: 'rgba(24, 27, 37, 0.75)',
+        backdropFilter: 'blur(32px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(32px) saturate(200%)',
+      }}
+    >
       {/* 底部渐变光线 */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
 
